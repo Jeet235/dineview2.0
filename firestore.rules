@@ -1,0 +1,166 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[A-Za-z0-9._-]+$');
+    }
+
+    function isValidPhoneDocId(phone) {
+      return phone is string && phone.size() >= 7 && phone.size() <= 20 && phone.matches('^\\+?[0-9]+$');
+    }
+
+    // Allows empty/null or masked phone numbers (e.g. XXXXXX1234).
+    // Prevents raw unmasked customer mobile numbers from being written into shared orders/sessions.
+    function isMaskedOrEmptyPhone(val) {
+      return val == null
+        || (val is string && (val == '' || val.matches('^X{2,12}[0-9]{2,4}$')));
+    }
+
+    function isValidOrderContact(data, orderId) {
+      return data.keys().hasAll(['orderId', 'maskedPhone', 'encryptedPhone', 'createdAt'])
+        && data.keys().hasOnly(['orderId', 'maskedPhone', 'encryptedPhone', 'createdAt'])
+        && data.orderId == orderId
+        && isMaskedOrEmptyPhone(data.maskedPhone)
+        && data.encryptedPhone is string
+        && data.encryptedPhone.size() >= 20
+        && data.encryptedPhone.size() <= 512
+        && data.encryptedPhone.matches('^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$')
+        && data.createdAt is string;
+    }
+
+    function isSessionDoc(data) {
+      return data.get('isSession', false) == true;
+    }
+
+    function hasTableSessionId(data) {
+      return data.get('tableSessionId', '') is string && data.get('tableSessionId', '') != '';
+    }
+
+    function sessionDocExists(sessionId) {
+      return exists(/databases/$(database)/documents/orders/$(sessionId));
+    }
+
+    function sessionIsActive(sessionId) {
+      return sessionDocExists(sessionId)
+        && get(/databases/$(database)/documents/orders/$(sessionId)).data.get('isSession', false) == true
+        && get(/databases/$(database)/documents/orders/$(sessionId)).data.get('status', '') == 'active';
+    }
+
+    function sessionIsClosed(sessionId) {
+      return sessionDocExists(sessionId)
+        && get(/databases/$(database)/documents/orders/$(sessionId)).data.get('isSession', false) == true
+        && get(/databases/$(database)/documents/orders/$(sessionId)).data.get('status', '') == 'closed';
+    }
+
+    // Default deny catch-all for any unspecified collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Encrypted phone vault per order:
+    // - Listing is strictly blocked (no bulk enumeration)
+    // - Ciphertext is AES-256-GCM encrypted with a server-only key and can only be decrypted
+    //   via the authenticated backend endpoint POST /api/staff/reveal-phone
+    match /order_contacts/{orderId} {
+      allow list: if false;
+      allow get: if isValidId(orderId);
+      allow create: if isValidId(orderId) && isValidOrderContact(request.resource.data, orderId);
+      allow update: if false;
+      allow delete: if isValidId(orderId);
+    }
+
+    // DineView Table Sessions (legacy collection if used)
+    match /sessions/{sessionId} {
+      allow read: if isValidId(sessionId);
+      allow create: if isValidId(sessionId)
+        && request.resource.data.get('status', 'active') == 'active'
+        && isMaskedOrEmptyPhone(request.resource.data.get('createdByPhone', ''));
+      allow update: if isValidId(sessionId)
+        && resource.data.get('status', '') != 'closed'
+        && (
+          isMaskedOrEmptyPhone(request.resource.data.get('createdByPhone', ''))
+          || request.resource.data.get('createdByPhone', '') == resource.data.get('createdByPhone', '')
+        );
+      allow delete: if isValidId(sessionId);
+    }
+
+    // DineView Orders & Table Session documents:
+    // - Enforces masked or empty customerPhone / createdByPhone on all new writes
+    // - Allows status/item updates on existing legacy records without altering legacy phone field
+    // - Enforces closed table session immutability at the database layer:
+    //   1) New table orders can ONLY be created against an existing active table session.
+    //   2) Closed session documents cannot be reopened or modified.
+    //   3) Orders belonging to a closed session cannot be edited, have items added, or be deleted.
+    match /orders/{orderId} {
+      allow list: if true;
+      allow get: if isValidId(orderId);
+      allow create: if isValidId(orderId)
+        && isMaskedOrEmptyPhone(request.resource.data.get('customerPhone', ''))
+        && isMaskedOrEmptyPhone(request.resource.data.get('createdByPhone', ''))
+        && (
+          isSessionDoc(request.resource.data)
+            ? request.resource.data.get('status', '') == 'active'
+            : (
+                !hasTableSessionId(request.resource.data)
+                || sessionIsActive(request.resource.data.tableSessionId)
+              )
+        );
+      allow update: if isValidId(orderId)
+        && (
+          isMaskedOrEmptyPhone(request.resource.data.get('customerPhone', ''))
+          || request.resource.data.get('customerPhone', '') == resource.data.get('customerPhone', '')
+        )
+        && (
+          isMaskedOrEmptyPhone(request.resource.data.get('createdByPhone', ''))
+          || request.resource.data.get('createdByPhone', '') == resource.data.get('createdByPhone', '')
+        )
+        && (
+          isSessionDoc(resource.data)
+            ? (
+                resource.data.get('status', '') != 'closed'
+                && isSessionDoc(request.resource.data)
+              )
+            : (
+                !isSessionDoc(request.resource.data)
+                && !(hasTableSessionId(resource.data) && sessionIsClosed(resource.data.tableSessionId))
+                && !(hasTableSessionId(request.resource.data) && sessionIsClosed(request.resource.data.tableSessionId))
+                && (
+                  request.resource.data.get('tableSessionId', '') == resource.data.get('tableSessionId', '')
+                  || !hasTableSessionId(request.resource.data)
+                  || sessionIsActive(request.resource.data.tableSessionId)
+                )
+              )
+        );
+      allow delete: if isValidId(orderId)
+        && !(
+          !isSessionDoc(resource.data)
+          && hasTableSessionId(resource.data)
+          && sessionIsClosed(resource.data.tableSessionId)
+        );
+    }
+
+    // DineView Customer Profiles:
+    // - Listing is strictly blocked so nobody can enumerate customer phone numbers
+    // - Direct point lookups by the customer's own normalized phone remain supported
+    match /customers/{phone} {
+      allow list: if false;
+      allow get, create, update: if isValidPhoneDocId(phone);
+      allow delete: if false;
+    }
+
+    // Restaurant Dining Tables and QR targets
+    match /tables/{tableId} {
+      allow list: if true;
+      allow get, create, update, delete: if isValidId(tableId);
+    }
+
+    // DineView Menu: Categories and Menu items live synced
+    match /menu/{menuDoc} {
+      allow list: if true;
+      allow get, create, update, delete: if isValidId(menuDoc);
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.gcloudignore
+.git
+.gitignore
+node_modules/
+dist/
+build/
+.aistudio/
+*.log
+bun.lock
+.env
+.env.local

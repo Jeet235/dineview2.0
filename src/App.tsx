@@ -1,0 +1,101 @@
+import React, { Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
+import { OrderProvider } from './context/OrderContext';
+import { MenuProvider } from './context/MenuContext';
+import { LanguageProvider } from './context/LanguageContext';
+import { TableProvider } from './context/TableContext';
+
+// Keep the critical path for the initial customer load synchronous
+import CustomerLayout from './pages/customer/CustomerLayout';
+import HomePage from './pages/customer/HomePage';
+
+// Lazy-load other customer pages
+const MenuPage = React.lazy(() => import('./pages/customer/MenuPage'));
+const ItemDetailsPage = React.lazy(() => import('./pages/customer/ItemDetailsPage'));
+const CartPage = React.lazy(() => import('./pages/customer/CartPage'));
+const OrderStatusPage = React.lazy(() => import('./pages/customer/OrderStatusPage'));
+const SmartConnectPage = React.lazy(() => import('./pages/customer/SmartConnectPage'));
+
+// Lazy-load all Admin pages (keeps admin code out of customer bundle)
+const AdminLayout = React.lazy(() => import('./pages/admin/AdminLayout'));
+const AdminLogin = React.lazy(() => import('./pages/admin/AdminLogin'));
+const AdminDashboard = React.lazy(() => import('./pages/admin/AdminDashboard'));
+const MenuManager = React.lazy(() => import('./pages/admin/MenuManager'));
+const MenuEditor = React.lazy(() => import('./pages/admin/MenuEditor'));
+const OrderManager = React.lazy(() => import('./pages/admin/OrderManager'));
+const TableManager = React.lazy(() => import('./pages/admin/TableManager'));
+const SessionHistoryPage = React.lazy(() => import('./pages/admin/SessionHistoryPage'));
+
+// Lazy-load Kitchen Manager pages
+const ManagerLayout = React.lazy(() => import('./pages/manager/ManagerLayout'));
+const ManagerLogin = React.lazy(() => import('./pages/manager/ManagerLogin'));
+const ManagerOrdersPage = React.lazy(() => import('./pages/manager/ManagerOrdersPage'));
+
+const LoadingFallback = () => (
+  <div className="flex h-screen w-full items-center justify-center bg-bg-primary">
+    <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
+
+// Let the application handle route scroll restoration deterministically
+if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <TableProvider>
+          <LanguageProvider>
+            <MenuProvider>
+              <OrderProvider>
+                <CartProvider>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Routes>
+                      {/* Customer Routes */}
+                      <Route path="/" element={<CustomerLayout />}>
+                        <Route index element={<HomePage />} />
+                        <Route path="menu" element={<MenuPage />} />
+                        <Route path="gallery" element={<Navigate to="/" replace />} />
+                        <Route path="locations" element={<HomePage />} />
+                        <Route path="item/:id" element={<ItemDetailsPage />} />
+                        <Route path="cart" element={<CartPage />} />
+                        <Route path="order/:id" element={<OrderStatusPage />} />
+                        <Route path="table-orders" element={<OrderStatusPage />} />
+                        <Route path="connect" element={<SmartConnectPage />} />
+                      </Route>
+
+                      {/* Admin Routes */}
+                      <Route path="/admin" element={<AdminLayout />}>
+                        <Route path="login" element={<AdminLogin />} />
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="menu" element={<MenuEditor />} />
+                        <Route path="menu-editor" element={<MenuEditor />} />
+                        <Route path="orders" element={<OrderManager />} />
+                        <Route path="sessions" element={<SessionHistoryPage />} />
+                        <Route path="tables" element={<TableManager />} />
+                      </Route>
+
+                      {/* Kitchen Manager Routes */}
+                      <Route path="/manager/login" element={<ManagerLogin />} />
+                      <Route path="/manager" element={<ManagerLayout />}>
+                        <Route index element={<ManagerOrdersPage />} />
+                        <Route path="orders" element={<ManagerOrdersPage />} />
+                      </Route>
+
+                      {/* Catch-all fallback */}
+                      <Route path="*" element={<Navigate to="/" replace />} />
+                    </Routes>
+                  </Suspense>
+                </CartProvider>
+              </OrderProvider>
+            </MenuProvider>
+          </LanguageProvider>
+        </TableProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}

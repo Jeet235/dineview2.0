@@ -1,0 +1,117 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "A dining order placed by a guest with items, total, table, phone, and kitchen status",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "preparing", "ready", "completed", "cancelled"] },
+        "createdAt": { "type": "string" },
+        "tableId": { "type": "string" },
+        "tableName": { "type": "string" },
+        "tableSessionId": { "type": "string" },
+        "customerPhone": { "type": "string", "description": "Masked customer phone (e.g. XXXXXX1234)" },
+        "customerPhoneHash": { "type": "string", "description": "Deterministic SHA-256 hash of normalized phone for lookups" },
+        "hasProtectedPhone": { "type": "boolean" },
+        "guestUid": { "type": "string" },
+        "managerConfirmed": { "type": "boolean" },
+        "managerConfirmedAt": { "type": "string" },
+        "managerConfirmedBy": { "type": "string" },
+        "kitchenNotes": { "type": "string" }
+      },
+      "required": ["id", "items", "total", "status", "createdAt"]
+    },
+    "OrderContact": {
+      "title": "OrderContact",
+      "description": "Encrypted customer mobile number vault entry tied to a single order ID; decryptable only by backend-authorized staff",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string" },
+        "maskedPhone": { "type": "string" },
+        "encryptedPhone": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["orderId", "maskedPhone", "encryptedPhone", "createdAt"]
+    },
+    "Session": {
+      "title": "Session",
+      "description": "Shared table dining session consolidating multiple orders, total bill, and time slot",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shortId": { "type": "string" },
+        "tableId": { "type": "string" },
+        "tableName": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "closed"] },
+        "startedAt": { "type": "string" },
+        "endedAt": { "type": "string" },
+        "durationMinutes": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "itemsCount": { "type": "number" },
+        "orderIds": { "type": "array" },
+        "createdByPhone": { "type": "string" },
+        "closedBy": { "type": "string" }
+      },
+      "required": ["id", "shortId", "tableId", "tableName", "status", "startedAt", "totalAmount", "itemsCount"]
+    },
+    "CustomerProfile": {
+      "title": "CustomerProfile",
+      "description": "Customer dining profile with order history and favorite dishes for personalized recommendations",
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string" },
+        "uid": { "type": "string" },
+        "firstSeenAt": { "type": "string" },
+        "lastOrderAt": { "type": "string" },
+        "totalOrders": { "type": "number" },
+        "totalSpent": { "type": "number" },
+        "favoriteDishIds": { "type": "array" },
+        "recentOrderIds": { "type": "array" },
+        "recentDishes": { "type": "array" },
+        "lastTableId": { "type": "string" }
+      },
+      "required": ["phone", "totalOrders", "totalSpent"]
+    },
+    "Table": {
+      "title": "Table",
+      "description": "Restaurant dining table for QR-based ordering",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "active": { "type": "boolean" },
+        "activeSessionId": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "active"]
+    }
+  },
+  "firestore": {
+    "/sessions/{sessionId}": {
+      "schema": "Session",
+      "description": "Collection of shared dining table sessions"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Collection of dining orders placed by customers and managed by staff (stores masked phone only)"
+    },
+    "/order_contacts/{orderId}": {
+      "schema": "OrderContact",
+      "description": "Encrypted mobile number records (AES-256-GCM ciphertext) for authorized staff contact reveal"
+    },
+    "/customers/{phone}": {
+      "schema": "CustomerProfile",
+      "description": "Collection of customer profiles keyed by E.164 phone number (point lookup only; listing blocked)"
+    },
+    "/tables/{tableId}": {
+      "schema": "Table",
+      "description": "Collection of dining tables and QR targets"
+    },
+    "/menu/{docId}": {
+      "description": "Collection of live synced restaurant menu categories and dishes"
+    }
+  }
+}
