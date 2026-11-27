@@ -713,36 +713,36 @@ export default function ManagerOrdersPage() {
     switch (status) {
       case 'pending':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-300">
-            <Clock className="w-3.5 h-3.5 text-amber-600 animate-spin" />
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-800 whitespace-nowrap">
+            <Clock className="w-3.5 h-3.5 text-amber-700" />
             Pending Confirmation
           </span>
         );
       case 'preparing':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-800 border border-blue-200">
-            <ChefHat className="w-3.5 h-3.5 text-blue-600" />
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-800 whitespace-nowrap">
+            <ChefHat className="w-3.5 h-3.5 text-blue-700" />
             Preparing
           </span>
         );
       case 'ready':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200">
-            <PackageCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-800 whitespace-nowrap">
+            <PackageCheck className="w-3.5 h-3.5 text-emerald-700" />
             Ready for Table
           </span>
         );
       case 'completed':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-neutral-100 text-neutral-600 border border-neutral-200">
-            <CheckCircle2 className="w-3.5 h-3.5 text-neutral-500" />
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-text-secondary whitespace-nowrap">
+            <CheckCircle2 className="w-3.5 h-3.5 text-text-muted" />
             Completed
           </span>
         );
       case 'cancelled':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-red-50 text-red-700 border border-red-200">
-            <X className="w-3.5 h-3.5 text-red-500" />
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-red-700 whitespace-nowrap">
+            <X className="w-3.5 h-3.5 text-red-600" />
             Cancelled
           </span>
         );
@@ -754,65 +754,62 @@ export default function ManagerOrdersPage() {
   return (
     <div>
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-serif text-text-primary">Kitchen Dispatch & Orders</h1>
+          <h1 className="text-3xl font-serif text-text-primary tracking-tight">
+            Kitchen Dispatch & Orders
+          </h1>
           <p className="text-sm text-text-secondary mt-1">
-            Real-time table session bill consolidation, live elapsed duration, and kitchen ticket dispatch.
+            Table session bill consolidation, live seated duration, and kitchen ticket dispatch.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">
-              Active Supervisor
-            </span>
-            <span className="text-sm font-bold text-text-primary">{managerName}</span>
-          </div>
+        <div className="text-left sm:text-right">
+          <span className="text-xs text-text-muted block">Active Supervisor</span>
+          <span className="text-sm font-medium text-text-primary">{managerName}</span>
         </div>
       </div>
 
-      {/* Metrics Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white border border-border rounded-sm p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-accent block mb-1">
-            Active Table Sessions
-          </span>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-serif font-bold text-accent">{activeSessions.length}</span>
-            <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              LIVE
+      {/* Flat Hairline KPI Strip */}
+      <div className="bg-white border border-border rounded-sm grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 divide-x divide-border mb-6">
+        <div className="p-4 sm:p-5">
+          <span className="text-xs text-text-secondary block mb-1">Active Table Sessions</span>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-mono tabular-nums font-medium text-text-primary">
+              {activeSessions.length}
+            </span>
+            <span className="text-xs font-medium text-emerald-700">Live</span>
+          </div>
+        </div>
+
+        <div className="p-4 sm:p-5">
+          <span className="text-xs text-text-secondary block mb-1">Pending Confirmation</span>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className={`text-2xl font-mono tabular-nums font-medium ${pendingOrders.length > 0 ? 'text-amber-800' : 'text-text-primary'}`}>
+              {pendingOrders.length}
+            </span>
+            <span className="text-xs text-text-muted">
+              {pendingOrders.length > 0 ? 'Needs review' : 'All clear'}
             </span>
           </div>
         </div>
 
-        <div className="bg-white border border-border rounded-sm p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block mb-1">
-            Pending Confirmation
-          </span>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-serif font-bold text-amber-900">{pendingOrders.length}</span>
-            <span className={`w-2.5 h-2.5 rounded-full ${pendingOrders.length > 0 ? 'bg-amber-500 animate-ping' : 'bg-neutral-300'}`}></span>
+        <div className="p-4 sm:p-5">
+          <span className="text-xs text-text-secondary block mb-1">In Kitchen</span>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-mono tabular-nums font-medium text-text-primary">
+              {preparingOrders.length}
+            </span>
+            <span className="text-xs text-text-muted">Preparing</span>
           </div>
         </div>
 
-        <div className="bg-white border border-border rounded-sm p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 block mb-1">
-            In Kitchen (Preparing)
-          </span>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-serif font-bold text-blue-900">{preparingOrders.length}</span>
-            <ChefHat className="w-4 h-4 text-blue-500" />
-          </div>
-        </div>
-
-        <div className="bg-white border border-border rounded-sm p-4 shadow-xs">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-600 block mb-1">
-            Total Tickets Filtered
-          </span>
-          <div className="flex items-baseline justify-between">
-            <span className="text-2xl font-serif font-bold text-text-primary">{filteredOrders.length}</span>
-            <span className="text-xs text-text-muted font-bold font-mono">
+        <div className="p-4 sm:p-5">
+          <span className="text-xs text-text-secondary block mb-1">Filtered Tickets</span>
+          <div className="flex items-baseline justify-between gap-2">
+            <span className="text-2xl font-mono tabular-nums font-medium text-text-primary">
+              {filteredOrders.length}
+            </span>
+            <span className="text-xs font-mono tabular-nums text-text-secondary">
               {formatCurrency(totalFilteredSales)}
             </span>
           </div>
@@ -820,13 +817,13 @@ export default function ManagerOrdersPage() {
       </div>
 
       {/* Date Filter & Sort Bar */}
-      <div className="bg-white border border-border rounded-sm p-4 mb-4 shadow-xs">
+      <div className="bg-white border border-border rounded-sm p-4 mb-4">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Date Presets */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5 me-2">
-              <Calendar className="w-4 h-4 text-accent" />
-              <span>Date Filter:</span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-medium text-text-secondary flex items-center gap-1.5 me-2">
+              <Calendar className="w-3.5 h-3.5 text-accent" />
+              <span>Date</span>
             </span>
 
             {DATE_PRESETS.map((preset) => {
@@ -836,18 +833,16 @@ export default function ManagerOrdersPage() {
                   key={preset.id}
                   type="button"
                   onClick={() => handleDatePresetClick(preset.id)}
-                  className={`px-3.5 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-all ${
+                  className={`px-3 py-1.5 rounded-sm text-xs font-medium transition-colors whitespace-nowrap ${
                     isActive
-                      ? 'bg-text-primary text-white shadow-xs'
-                      : 'bg-border/20 text-text-secondary hover:bg-border/50'
+                      ? 'bg-text-primary text-bg-primary'
+                      : 'bg-bg-secondary text-text-secondary hover:text-text-primary'
                   }`}
                 >
-                  {preset.label}
+                  <span>{preset.label}</span>
                   {countsPerDay[preset.id] !== undefined && (
-                    <span className={`ms-1.5 text-[10px] px-1.5 py-0.2 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-border text-text-primary'
-                    }`}>
-                      {countsPerDay[preset.id]}
+                    <span className="ms-1.5 font-mono tabular-nums text-[11px] opacity-80">
+                      ({countsPerDay[preset.id]})
                     </span>
                   )}
                 </button>
@@ -858,25 +853,25 @@ export default function ManagerOrdersPage() {
           {/* Sort Selector & View Toggle */}
           <div className="flex flex-wrap items-center gap-3">
             {/* View Mode Toggle */}
-            <div className="inline-flex rounded-sm p-1 bg-border/30 border border-border">
+            <div className="inline-flex rounded-sm p-0.5 bg-bg-secondary border border-border">
               <button
                 type="button"
                 onClick={() => setViewMode('sessions')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold uppercase tracking-wider transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-medium transition-colors whitespace-nowrap ${
                   viewMode === 'sessions'
-                    ? 'bg-white text-text-primary shadow-xs font-bold'
+                    ? 'bg-white text-text-primary'
                     : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
                 <Layers className="w-3.5 h-3.5 text-accent" />
-                Group by Table Session
+                Table Sessions
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('stream')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold uppercase tracking-wider transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-medium transition-colors whitespace-nowrap ${
                   viewMode === 'stream'
-                    ? 'bg-white text-text-primary shadow-xs font-bold'
+                    ? 'bg-white text-text-primary'
                     : 'text-text-secondary hover:text-text-primary'
                 }`}
               >
@@ -890,7 +885,7 @@ export default function ManagerOrdersPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOptionType)}
-                className="bg-bg-primary border border-border rounded-sm px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-text-primary focus:outline-hidden"
+                className="bg-bg-primary border border-border rounded-sm px-3 py-1.5 text-xs font-medium text-text-primary focus:outline-hidden focus:border-text-primary"
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -903,26 +898,26 @@ export default function ManagerOrdersPage() {
 
         {/* Custom Date Range Picker */}
         {dateFilter.type === 'custom' && (
-          <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-4 text-xs font-medium">
-            <span className="text-text-muted uppercase tracking-wider text-[10px] font-bold flex items-center gap-1">
-              <CalendarRange className="w-3.5 h-3.5" /> Custom Date Span:
+          <div className="mt-3 pt-3 border-t border-border flex flex-wrap items-center gap-4 text-xs">
+            <span className="text-text-secondary font-medium flex items-center gap-1.5">
+              <CalendarRange className="w-3.5 h-3.5 text-accent" /> Custom Range
             </span>
             <div className="flex items-center gap-2">
-              <label className="text-text-secondary">From:</label>
+              <label className="text-text-secondary">From</label>
               <input
                 type="date"
                 value={dateFilter.startDate || ''}
                 onChange={(e) => setDateFilter((prev) => ({ ...prev, startDate: e.target.value }))}
-                className="bg-bg-primary border border-border px-2 py-1 rounded-sm text-xs font-mono"
+                className="bg-bg-primary border border-border px-2.5 py-1 rounded-sm text-xs font-mono tabular-nums"
               />
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-text-secondary">To:</label>
+              <label className="text-text-secondary">To</label>
               <input
                 type="date"
                 value={dateFilter.endDate || ''}
                 onChange={(e) => setDateFilter((prev) => ({ ...prev, endDate: e.target.value }))}
-                className="bg-bg-primary border border-border px-2 py-1 rounded-sm text-xs font-mono"
+                className="bg-bg-primary border border-border px-2.5 py-1 rounded-sm text-xs font-mono tabular-nums"
               />
             </div>
           </div>
@@ -930,7 +925,7 @@ export default function ManagerOrdersPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="flex flex-col md:flex-row gap-3 mb-6">
         <div className="flex-1 relative">
           <Search className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -938,18 +933,18 @@ export default function ManagerOrdersPage() {
             placeholder="Search by ticket #, table, dish name, or customer phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 bg-white border border-border rounded-sm text-sm focus:outline-hidden focus:border-text-primary"
+            className="w-full pl-9 pr-4 py-2 bg-white border border-border rounded-sm text-sm focus:outline-hidden focus:border-text-primary"
           />
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {['all', 'pending', 'preparing', 'ready', 'completed'].map((status) => (
             <button
               key={status}
               onClick={() => setSelectedStatus(status)}
-              className={`px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors ${
+              className={`px-3.5 py-2 rounded-sm text-xs font-medium capitalize transition-colors ${
                 selectedStatus === status
-                  ? 'bg-text-primary text-white'
-                  : 'bg-white border border-border text-text-secondary hover:bg-border/30'
+                  ? 'bg-text-primary text-bg-primary'
+                  : 'bg-white border border-border text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
               }`}
             >
               {status}
@@ -980,77 +975,75 @@ export default function ManagerOrdersPage() {
               return (
                 <div
                   key={group.key}
-                  className={`bg-white border rounded-sm shadow-xs transition-all ${
+                  className={`bg-white border border-border rounded-sm transition-colors ${
                     session?.status === 'active'
-                      ? 'border-accent/60 ring-1 ring-accent/20'
-                      : 'border-border'
+                      ? 'border-l-2 border-l-accent'
+                      : ''
                   }`}
                 >
                   {/* Session Header Card */}
-                  <div className="p-5 border-b border-border bg-[#FDFCFB]">
+                  <div className="p-5 border-b border-border bg-bg-primary">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       {/* Left: Table Title & Session ID */}
-                      <div className="flex items-start sm:items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          session?.status === 'active'
-                            ? 'bg-accent/15 text-accent'
-                            : 'bg-neutral-100 text-neutral-600'
-                        }`}>
-                          <Users className="w-5 h-5" />
-                        </div>
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="font-serif text-xl font-bold text-text-primary">
-                              {session?.tableName || (group.key === 'COUNTER' ? 'Counter & Takeaway' : `Table ${session?.tableId || ''}`)}
-                            </h3>
-                            {session?.shortId && (
-                              <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-accent/20 text-accent border border-accent/30">
-                                Session #{session.shortId}
-                              </span>
-                            )}
-                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                              session?.status === 'active'
-                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                                : 'bg-neutral-100 text-neutral-600'
-                            }`}>
-                              {session?.status === 'active' ? 'Active Table' : (group.key === 'COUNTER' ? 'Quick Service' : 'Closed Tab')}
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                          <h3 className="font-serif text-xl font-semibold text-text-primary">
+                            {session?.tableName || (group.key === 'COUNTER' ? 'Counter & Takeaway' : `Table ${session?.tableId || ''}`)}
+                          </h3>
+                          {session?.shortId && (
+                            <span className="font-mono tabular-nums text-xs font-medium text-accent">
+                              #{session.shortId}
                             </span>
-                          </div>
+                          )}
+                          <span className="text-text-muted">·</span>
+                          <span className={`text-xs font-medium ${
+                            session?.status === 'active'
+                              ? 'text-emerald-700'
+                              : 'text-text-muted'
+                          }`}>
+                            {session?.status === 'active' ? 'Active Table' : (group.key === 'COUNTER' ? 'Quick Service' : 'Closed Tab')}
+                          </span>
+                        </div>
 
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-text-secondary mt-1">
-                            {session?.startedAt && (
-                              <span className="flex items-center gap-1 font-medium">
-                                <Clock className="w-3.5 h-3.5 text-text-muted" />
-                                Started {new Date(session.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-text-secondary mt-1.5">
+                          {session?.startedAt && (
+                            <span className="inline-flex items-center gap-1 font-mono tabular-nums">
+                              <Clock className="w-3.5 h-3.5 text-text-muted" />
+                              Started {new Date(session.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                          {session?.startedAt && session.status === 'active' && (
+                            <>
+                              <span className="text-text-muted">·</span>
+                              <span className="font-mono tabular-nums font-medium text-amber-800">
+                                {getElapsedDuration(session.startedAt)}
                               </span>
-                            )}
-                            {session?.startedAt && session.status === 'active' && (
-                              <span className="px-2 py-0.5 rounded-sm bg-amber-50 text-amber-800 font-bold border border-amber-200 text-[11px]">
-                                ⏳ {getElapsedDuration(session.startedAt)}
-                              </span>
-                            )}
-                            {session?.createdByPhone && (
-                              <span className="flex items-center gap-1 text-text-muted">
+                            </>
+                          )}
+                          {session?.createdByPhone && (
+                            <>
+                              <span className="text-text-muted">·</span>
+                              <span className="inline-flex items-center gap-1 font-mono tabular-nums text-text-muted">
                                 <Phone className="w-3 h-3" />
-                                Host: {maskPhone(session.createdByPhone)}
+                                Host {maskPhone(session.createdByPhone)}
                               </span>
-                            )}
-                          </div>
+                            </>
+                          )}
                         </div>
                       </div>
 
                       {/* Right: Consolidated Totals & Actions */}
                       <div className="flex items-center gap-4 flex-wrap justify-between lg:justify-end">
-                        <div className="text-right">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">
-                            Payable Confirmed Tab ({group.itemsCount} dishes)
+                        <div className="text-left lg:text-right">
+                          <span className="text-xs text-text-muted block">
+                            Confirmed Tab ({group.itemsCount} dishes)
                           </span>
-                          <span className="text-xl font-serif font-bold text-text-primary">
+                          <span className="text-xl font-mono tabular-nums font-semibold text-text-primary">
                             {formatCurrency(group.totalAmount)}
                           </span>
-                          <span className="text-[10px] text-text-secondary block">
+                          <span className="text-[11px] text-text-secondary block font-mono tabular-nums">
                             {group.confirmedCount} confirmed
-                            {group.pendingCount > 0 ? ` • ${group.pendingCount} pending (excluded)` : ''}
+                            {group.pendingCount > 0 ? ` · ${group.pendingCount} pending (excluded)` : ''}
                           </span>
                         </div>
 
@@ -1060,7 +1053,7 @@ export default function ManagerOrdersPage() {
                             <button
                               type="button"
                               onClick={() => handlePrintConsolidatedBill(session, group.key, group.allSessionOrders)}
-                              className="bg-white border border-border text-text-primary hover:bg-neutral-50 px-3 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-2xs"
+                              className="bg-white border border-border text-text-primary hover:bg-bg-secondary px-3 py-2 rounded-sm text-xs font-medium transition-colors flex items-center gap-1.5 whitespace-nowrap"
                               title="Preview bill without closing session"
                             >
                               <Printer className="w-3.5 h-3.5 text-accent" />
@@ -1072,9 +1065,9 @@ export default function ManagerOrdersPage() {
                                 setCloseSessionError(null);
                                 setClosingSession(session);
                               }}
-                              className="bg-text-primary text-white hover:bg-black px-4 py-2.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-xs"
+                              className="bg-text-primary text-bg-primary hover:bg-text-primary/90 px-4 py-2 rounded-sm text-xs font-medium transition-colors flex items-center gap-1.5 whitespace-nowrap"
                             >
-                              <Lock className="w-3.5 h-3.5 text-amber-400" />
+                              <Lock className="w-3.5 h-3.5 text-amber-300" />
                               Close Session
                             </button>
                           </div>
@@ -1082,9 +1075,9 @@ export default function ManagerOrdersPage() {
                           <button
                             type="button"
                             onClick={() => handlePrintConsolidatedBill(session, group.key, group.allSessionOrders)}
-                            className="bg-text-primary text-white hover:bg-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-xs"
+                            className="bg-text-primary text-bg-primary hover:bg-text-primary/90 px-4 py-2 rounded-sm text-xs font-medium transition-colors flex items-center gap-1.5 whitespace-nowrap"
                           >
-                            <Printer className="w-3.5 h-3.5 text-accent" />
+                            <Printer className="w-3.5 h-3.5" />
                             Print Complete Bill
                           </button>
                         )}
@@ -1111,22 +1104,22 @@ export default function ManagerOrdersPage() {
                         </p>
                       ) : (
                         <div className="space-y-4">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-text-muted block">
-                            Sub-Orders Placed in this Session ({group.orders.length})
+                          <span className="text-xs font-medium text-text-muted block">
+                            Sub-Orders in Session ({group.orders.length})
                           </span>
-                          
+
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {group.orders.map((order) => {
                               const isLockedClosed = isGroupClosedSession || isOrderInClosedSession(order);
                               return (
                               <div
                                 key={order.id}
-                                className="border border-border/70 rounded-sm p-4 bg-[#FAF9F8] flex flex-col justify-between"
+                                className="border border-border rounded-sm p-4 bg-bg-primary flex flex-col justify-between"
                               >
                                 <div>
-                                  <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                      <span className="font-mono font-bold text-sm text-text-primary">
+                                  <div className="flex items-center justify-between gap-2 mb-2">
+                                    <div className="flex items-center gap-2 font-mono tabular-nums">
+                                      <span className="font-semibold text-sm text-text-primary">
                                         #{order.id}
                                       </span>
                                       <span className="text-xs text-text-muted">
@@ -1141,14 +1134,14 @@ export default function ManagerOrdersPage() {
                                     <div className="mb-3 space-y-1">
                                       <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
                                         <Phone className="w-3.5 h-3.5 text-text-muted" />
-                                        <span className="font-mono">
+                                        <span className="font-mono tabular-nums">
                                           {revealedPhones[order.id] || maskPhone(order.customerPhone)}
                                         </span>
                                         <button
                                           type="button"
                                           disabled={revealingPhoneId === order.id}
                                           onClick={() => handleToggleFullPhone(order)}
-                                          className="text-[10px] text-accent font-bold uppercase underline disabled:opacity-50"
+                                          className="text-xs text-accent font-medium underline disabled:opacity-50"
                                         >
                                           {revealingPhoneId === order.id
                                             ? 'Verifying...'
@@ -1164,13 +1157,13 @@ export default function ManagerOrdersPage() {
                                   )}
 
                                   {/* Dish Items */}
-                                  <div className="space-y-1.5 mb-3 border-t border-border/40 pt-2">
+                                  <div className="space-y-1.5 mb-3 border-t border-border pt-2">
                                     {order.items.map((item) => (
-                                      <div key={item.cartItemId} className="flex justify-between items-center text-xs">
+                                      <div key={item.cartItemId} className="flex justify-between items-center text-xs gap-2">
                                         <span className="text-text-primary font-medium">
-                                          {item.quantity}x {item.name}
+                                          <span className="font-mono tabular-nums">{item.quantity}×</span> {item.name}
                                         </span>
-                                        <span className="text-text-secondary">
+                                        <span className="font-mono tabular-nums text-text-secondary shrink-0">
                                           {formatCurrency(item.price * item.quantity)}
                                         </span>
                                       </div>
@@ -1178,21 +1171,21 @@ export default function ManagerOrdersPage() {
                                   </div>
 
                                   {order.kitchenNotes && (
-                                    <div className="p-2 rounded bg-amber-50/70 border border-amber-200 text-xs text-amber-900 mb-3">
-                                      <span className="font-bold">Note: </span>
+                                    <div className="p-2.5 rounded-sm bg-amber-50/70 border border-amber-200 text-xs text-amber-900 mb-3">
+                                      <span className="font-medium">Note: </span>
                                       <span>{order.kitchenNotes}</span>
                                     </div>
                                   )}
                                 </div>
 
                                 {/* Order Action Buttons */}
-                                <div className="border-t border-border/50 pt-3 flex flex-wrap items-center justify-between gap-2">
+                                <div className="border-t border-border pt-3 flex flex-wrap items-center justify-between gap-2">
                                   <div>
-                                    <span className="font-bold text-sm text-text-primary block">
+                                    <span className="font-mono tabular-nums font-semibold text-sm text-text-primary block">
                                       {formatCurrency(order.total)}
                                     </span>
                                     {order.status === 'pending' && (
-                                      <span className="text-[10px] text-amber-700 font-semibold">
+                                      <span className="text-[11px] text-amber-800">
                                         Not yet in payable bill
                                       </span>
                                     )}
@@ -1203,10 +1196,10 @@ export default function ManagerOrdersPage() {
                                       type="button"
                                       disabled={isLockedClosed}
                                       onClick={() => handleOpenEdit(order, false)}
-                                      className={`p-1.5 border rounded-sm text-xs flex items-center gap-1 ${
+                                      className={`px-2 py-1.5 border rounded-sm text-xs font-medium flex items-center gap-1 transition-colors ${
                                         isLockedClosed
-                                          ? 'text-neutral-400 bg-neutral-100 border-border/60 cursor-not-allowed opacity-60'
-                                          : 'text-text-secondary hover:text-text-primary border-border hover:bg-white'
+                                          ? 'text-text-muted bg-bg-secondary border-border cursor-not-allowed opacity-60'
+                                          : 'text-text-secondary hover:text-text-primary border-border bg-white hover:bg-bg-secondary'
                                       }`}
                                       title={isLockedClosed ? 'Session closed — order is locked' : 'Edit Order Dishes'}
                                     >
@@ -1218,10 +1211,10 @@ export default function ManagerOrdersPage() {
                                       type="button"
                                       disabled={isLockedClosed}
                                       onClick={() => handleOpenEdit(order, true)}
-                                      className={`p-1.5 border rounded-sm text-xs flex items-center gap-1 font-bold transition-colors ${
+                                      className={`px-2.5 py-1.5 border rounded-sm text-xs font-medium flex items-center gap-1 transition-colors ${
                                         isLockedClosed
-                                          ? 'text-neutral-400 bg-neutral-100 border-border/60 cursor-not-allowed opacity-60'
-                                          : 'text-accent hover:text-accent-hover border-accent/40 bg-accent/5 hover:bg-accent/15'
+                                          ? 'text-text-muted bg-bg-secondary border-border cursor-not-allowed opacity-60'
+                                          : 'text-accent hover:text-accent-hover border-accent/40 bg-white hover:bg-bg-secondary'
                                       }`}
                                       title={isLockedClosed ? 'Session closed — cannot add items' : 'Add Menu Item to Order'}
                                     >
@@ -1230,7 +1223,7 @@ export default function ManagerOrdersPage() {
                                     </button>
 
                                     {isLockedClosed ? (
-                                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-sm bg-neutral-100 border border-border text-[10px] font-bold uppercase tracking-wider text-neutral-500">
+                                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-text-muted">
                                         <Lock className="w-3 h-3" />
                                         Session Closed
                                       </span>
@@ -1241,7 +1234,7 @@ export default function ManagerOrdersPage() {
                                             <button
                                               type="button"
                                               onClick={() => handleRequestDeleteOrder(order)}
-                                              className="p-1.5 px-2.5 text-red-700 hover:bg-red-100 bg-red-50 border border-red-200 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1 transition-colors"
+                                              className="px-2.5 py-1.5 text-red-700 hover:bg-red-100 bg-red-50 border border-red-200 rounded-sm text-xs font-medium flex items-center gap-1 transition-colors"
                                               title="Delete Pending Order"
                                             >
                                               <Trash2 className="w-3.5 h-3.5" />
@@ -1250,7 +1243,7 @@ export default function ManagerOrdersPage() {
                                             <button
                                               type="button"
                                               onClick={() => handleConfirmOrder(order.id)}
-                                              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors"
+                                              className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1.5 rounded-sm text-xs font-medium transition-colors"
                                             >
                                               Confirm
                                             </button>
@@ -1261,7 +1254,7 @@ export default function ManagerOrdersPage() {
                                           <button
                                             type="button"
                                             onClick={() => updateOrderStatus(order.id, 'ready')}
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors"
+                                            className="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-sm text-xs font-medium transition-colors"
                                           >
                                             Mark Ready
                                           </button>
@@ -1271,7 +1264,7 @@ export default function ManagerOrdersPage() {
                                           <button
                                             type="button"
                                             onClick={() => updateOrderStatus(order.id, 'completed')}
-                                            className="bg-text-primary hover:bg-black text-white px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors"
+                                            className="bg-text-primary hover:bg-text-primary/90 text-bg-primary px-3 py-1.5 rounded-sm text-xs font-medium transition-colors"
                                           >
                                             Served
                                           </button>
@@ -1310,27 +1303,34 @@ export default function ManagerOrdersPage() {
               return (
                 <div
                   key={order.id}
-                  className="bg-white border border-border rounded-sm p-6 shadow-xs hover:border-text-secondary transition-colors"
+                  className="bg-white border border-border rounded-sm p-5 hover:border-text-secondary/50 transition-colors"
                 >
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4 pb-4 border-b border-border">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-xl font-bold text-text-primary">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-4 pb-4 border-b border-border">
+                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                      <span className="font-mono tabular-nums text-lg font-semibold text-text-primary">
                         #{order.id}
                       </span>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-border/20 border border-border text-text-primary">
-                        <span>{order.tableId && order.tableId !== 'COUNTER' ? `Table ${order.tableId}` : 'Counter'}</span>
-                      </div>
+                      <span className="text-text-muted">·</span>
+                      <span className="text-xs font-medium text-text-primary">
+                        {order.tableId && order.tableId !== 'COUNTER' ? `Table ${order.tableId}` : 'Counter'}
+                      </span>
                       {order.tableSessionId && (
-                        <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-accent/15 text-accent border border-accent/30">
-                          Session #{linkedSession?.shortId || order.tableSessionId.substring(order.tableSessionId.length - 4).toUpperCase()}
-                        </span>
+                        <>
+                          <span className="text-text-muted">·</span>
+                          <span className="font-mono tabular-nums text-xs font-medium text-accent">
+                            Session #{linkedSession?.shortId || order.tableSessionId.substring(order.tableSessionId.length - 4).toUpperCase()}
+                          </span>
+                        </>
                       )}
+                      <span className="text-text-muted">·</span>
                       <div>{getStatusBadge(order.status)}</div>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-text-secondary">
-                      <span>{new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      <span className="text-xl font-serif font-bold text-text-primary">
+                    <div className="flex items-baseline gap-4 text-xs text-text-secondary">
+                      <span className="font-mono tabular-nums">
+                        {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <span className="text-lg font-mono tabular-nums font-semibold text-text-primary">
                         {formatCurrency(order.total)}
                       </span>
                     </div>
@@ -1341,15 +1341,15 @@ export default function ManagerOrdersPage() {
                     <div className="mb-4 space-y-1">
                       <div className="flex flex-wrap items-center gap-2 text-xs text-text-secondary">
                         <Phone className="w-3.5 h-3.5 text-text-muted" />
-                        <span>Customer: </span>
-                        <span className="font-mono font-semibold text-text-primary">
+                        <span>Customer</span>
+                        <span className="font-mono tabular-nums font-medium text-text-primary">
                           {revealedPhones[order.id] || maskPhone(order.customerPhone)}
                         </span>
                         <button
                           type="button"
                           disabled={revealingPhoneId === order.id}
                           onClick={() => handleToggleFullPhone(order)}
-                          className="text-[10px] text-accent font-bold uppercase underline ms-1 disabled:opacity-50"
+                          className="text-xs text-accent font-medium underline ms-1 disabled:opacity-50"
                         >
                           {revealingPhoneId === order.id
                             ? 'Verifying...'
@@ -1367,11 +1367,11 @@ export default function ManagerOrdersPage() {
                   {/* Items list */}
                   <div className="space-y-2 mb-4">
                     {order.items.map((item) => (
-                      <div key={item.cartItemId} className="flex justify-between items-center text-sm">
+                      <div key={item.cartItemId} className="flex justify-between items-center text-sm gap-2">
                         <span className="text-text-primary font-medium">
-                          {item.quantity}x {item.name}
+                          <span className="font-mono tabular-nums">{item.quantity}×</span> {item.name}
                         </span>
-                        <span className="text-text-secondary">
+                        <span className="font-mono tabular-nums text-text-secondary shrink-0">
                           {formatCurrency(item.price * item.quantity)}
                         </span>
                       </div>
@@ -1379,8 +1379,8 @@ export default function ManagerOrdersPage() {
                   </div>
 
                   {order.kitchenNotes && (
-                    <div className="p-3 rounded bg-amber-50 border border-amber-200 text-xs text-amber-900 mb-4">
-                      <span className="font-bold">Kitchen Instructions: </span>
+                    <div className="p-3 rounded-sm bg-amber-50 border border-amber-200 text-xs text-amber-900 mb-4">
+                      <span className="font-medium">Kitchen Instructions: </span>
                       <span>{order.kitchenNotes}</span>
                     </div>
                   )}
@@ -1393,10 +1393,10 @@ export default function ManagerOrdersPage() {
                         disabled={isLockedClosed}
                         onClick={() => handleOpenEdit(order, false)}
                         title={isLockedClosed ? 'Session closed — order is locked' : 'Edit Dishes'}
-                        className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider border px-3 py-1.5 rounded-sm transition-colors ${
+                        className={`flex items-center gap-1.5 text-xs font-medium border px-3 py-1.5 rounded-sm transition-colors ${
                           isLockedClosed
-                            ? 'text-neutral-400 bg-neutral-100 border-border/60 cursor-not-allowed opacity-60'
-                            : 'text-text-secondary hover:text-text-primary border-border hover:bg-neutral-50'
+                            ? 'text-text-muted bg-bg-secondary border-border cursor-not-allowed opacity-60'
+                            : 'text-text-secondary hover:text-text-primary border-border hover:bg-bg-secondary'
                         }`}
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -1407,20 +1407,20 @@ export default function ManagerOrdersPage() {
                         disabled={isLockedClosed}
                         onClick={() => handleOpenEdit(order, true)}
                         title={isLockedClosed ? 'Session closed — cannot add items' : 'Add Menu Item to Order'}
-                        className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider border px-3 py-1.5 rounded-sm transition-colors ${
+                        className={`flex items-center gap-1.5 text-xs font-medium border px-3 py-1.5 rounded-sm transition-colors ${
                           isLockedClosed
-                            ? 'text-neutral-400 bg-neutral-100 border-border/60 cursor-not-allowed opacity-60'
-                            : 'text-accent hover:text-accent-hover border-accent/40 bg-accent/5 hover:bg-accent/15'
+                            ? 'text-text-muted bg-bg-secondary border-border cursor-not-allowed opacity-60'
+                            : 'text-accent hover:text-accent-hover border-accent/40 bg-white hover:bg-bg-secondary'
                         }`}
                       >
                         <Plus className="w-3.5 h-3.5" />
-                        + Add Item
+                        Add Item
                       </button>
                     </div>
 
                     <div className="flex items-center gap-2">
                       {isLockedClosed ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-neutral-100 border border-border text-xs font-bold uppercase tracking-wider text-neutral-500">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium text-text-muted">
                           <Lock className="w-3.5 h-3.5" />
                           Session Closed
                         </span>
@@ -1431,7 +1431,7 @@ export default function ManagerOrdersPage() {
                               <button
                                 type="button"
                                 onClick={() => handleRequestDeleteOrder(order)}
-                                className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3.5 py-2 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                                className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3.5 py-2 rounded-sm text-xs font-medium flex items-center gap-1.5 transition-colors"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                                 Delete Order
@@ -1439,7 +1439,7 @@ export default function ManagerOrdersPage() {
                               <button
                                 type="button"
                                 onClick={() => handleConfirmOrder(order.id)}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider"
+                                className="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-sm text-xs font-medium transition-colors"
                               >
                                 Confirm Order
                               </button>
@@ -1449,7 +1449,7 @@ export default function ManagerOrdersPage() {
                             <button
                               type="button"
                               onClick={() => updateOrderStatus(order.id, 'ready')}
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider"
+                              className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-sm text-xs font-medium transition-colors"
                             >
                               Mark Ready
                             </button>
@@ -1458,7 +1458,7 @@ export default function ManagerOrdersPage() {
                             <button
                               type="button"
                               onClick={() => updateOrderStatus(order.id, 'completed')}
-                              className="bg-text-primary hover:bg-black text-white px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider"
+                              className="bg-text-primary hover:bg-text-primary/90 text-bg-primary px-4 py-2 rounded-sm text-xs font-medium transition-colors"
                             >
                               Mark Served
                             </button>
@@ -1524,36 +1524,38 @@ export default function ManagerOrdersPage() {
                   </div>
                 )}
 
-                <div className="bg-bg-primary p-4 rounded-sm border border-border space-y-2 text-xs">
+              <div className="bg-bg-primary p-4 rounded-sm border border-border space-y-2 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Table:</span>
-                    <span className="font-semibold text-text-primary">{closingSession.tableName}</span>
+                    <span className="text-text-secondary">Table</span>
+                    <span className="font-medium text-text-primary">{closingSession.tableName}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Session Started:</span>
-                    <span className="font-semibold text-text-primary">
+                    <span className="text-text-secondary">Session Started</span>
+                    <span className="font-mono tabular-nums font-medium text-text-primary">
                       {new Date(closingSession.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Elapsed Dining Time:</span>
-                    <span className="font-semibold text-text-primary">
+                    <span className="text-text-secondary">Elapsed Dining Time</span>
+                    <span className="font-mono tabular-nums font-medium text-text-primary">
                       {getElapsedDuration(closingSession.startedAt)}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Confirmed Dishes Served:</span>
-                    <span className="font-semibold text-text-primary">{confirmedDishes} items ({confirmedOrders.length} orders)</span>
+                    <span className="text-text-secondary">Confirmed Dishes Served</span>
+                    <span className="font-mono tabular-nums font-medium text-text-primary">
+                      {confirmedDishes} items ({confirmedOrders.length} orders)
+                    </span>
                   </div>
                   <div className="border-t border-border pt-2 flex justify-between text-sm">
-                    <span className="font-bold text-text-primary">Final Consolidated Bill:</span>
-                    <span className="font-serif font-bold text-text-primary text-base">
+                    <span className="font-medium text-text-primary">Final Consolidated Bill</span>
+                    <span className="font-mono tabular-nums font-semibold text-text-primary text-base">
                       {formatCurrency(confirmedTotal)}
                     </span>
                   </div>
                 </div>
 
-                <p className="text-[11px] text-text-muted italic">
+                <p className="text-xs text-text-muted">
                   Closing will archive this session. Any subsequent order scanned from this table will automatically open a fresh session.
                 </p>
               </div>
@@ -1563,7 +1565,7 @@ export default function ManagerOrdersPage() {
                   type="button"
                   onClick={() => setClosingSession(null)}
                   disabled={isClosingAction}
-                  className="px-4 py-2 border border-border rounded-sm text-xs font-bold uppercase tracking-wider text-text-secondary hover:bg-border/30"
+                  className="px-4 py-2 border border-border rounded-sm text-xs font-medium text-text-secondary hover:bg-bg-secondary"
                 >
                   Cancel
                 </button>
@@ -1571,7 +1573,7 @@ export default function ManagerOrdersPage() {
                   type="button"
                   onClick={handleCloseSessionConfirm}
                   disabled={isClosingAction}
-                  className="px-5 py-2 bg-text-primary hover:bg-black text-white rounded-sm text-xs font-bold uppercase tracking-wider shadow-xs flex items-center gap-1.5"
+                  className="px-5 py-2 bg-text-primary hover:bg-text-primary/90 text-bg-primary rounded-sm text-xs font-medium flex items-center gap-1.5"
                 >
                   {isClosingAction ? (
                     <>
@@ -1580,7 +1582,7 @@ export default function ManagerOrdersPage() {
                     </>
                   ) : (
                     <>
-                      <Lock className="w-3.5 h-3.5 text-amber-400" />
+                      <Lock className="w-3.5 h-3.5 text-amber-300" />
                       Confirm & Close Session
                     </>
                   )}
@@ -1594,15 +1596,13 @@ export default function ManagerOrdersPage() {
       {/* Session Just Closed - Immediate Print Complete Bill Modal */}
       {sessionJustClosed && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white rounded-sm max-w-md w-full p-6 shadow-2xl border border-border animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-4 border-b border-border mb-4">
-              <div className="flex items-center gap-2.5 text-emerald-800">
-                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
+          <div className="bg-white rounded-sm max-w-md w-full p-6 border border-border">
+            <div className="flex items-start justify-between pb-4 border-b border-border mb-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
                 <div>
-                  <h3 className="font-serif text-lg font-bold text-text-primary">Session Closed Successfully</h3>
-                  <span className="text-[11px] text-text-muted">Consolidated Tab Settled</span>
+                  <h3 className="font-serif text-lg font-semibold text-text-primary">Session Closed</h3>
+                  <span className="text-xs text-text-muted">Consolidated Tab Settled</span>
                 </div>
               </div>
               <button
@@ -1616,31 +1616,31 @@ export default function ManagerOrdersPage() {
 
             <div className="space-y-3 mb-6">
               <p className="text-xs text-text-secondary">
-                The session for <span className="font-bold text-text-primary">{sessionJustClosed.session.tableName}</span> (Session #{sessionJustClosed.session.shortId}) is closed. You can print the complete consolidated session bill now or reopen it anytime from the closed tab history.
+                The session for <span className="font-semibold text-text-primary">{sessionJustClosed.session.tableName}</span> (Session #{sessionJustClosed.session.shortId}) is closed. You can print the complete consolidated session bill now or reopen it anytime from the closed tab history.
               </p>
 
               <div className="bg-bg-primary p-4 rounded-sm border border-border space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-text-secondary">Table:</span>
-                  <span className="font-semibold text-text-primary">{sessionJustClosed.session.tableName}</span>
+                  <span className="text-text-secondary">Table</span>
+                  <span className="font-medium text-text-primary">{sessionJustClosed.session.tableName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-text-secondary">Session ID:</span>
-                  <span className="font-mono font-bold text-accent">#{sessionJustClosed.session.shortId}</span>
+                  <span className="text-text-secondary">Session ID</span>
+                  <span className="font-mono tabular-nums font-medium text-accent">#{sessionJustClosed.session.shortId}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-text-secondary">Confirmed Orders Settled:</span>
-                  <span className="font-semibold text-text-primary">
+                  <span className="text-text-secondary">Confirmed Orders Settled</span>
+                  <span className="font-mono tabular-nums font-medium text-text-primary">
                     {sessionJustClosed.orders.filter((o) => isPayableOrder(o)).length} tickets
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-text-secondary">Confirmed Dishes:</span>
-                  <span className="font-semibold text-text-primary">{sessionJustClosed.session.itemsCount} dishes</span>
+                  <span className="text-text-secondary">Confirmed Dishes</span>
+                  <span className="font-mono tabular-nums font-medium text-text-primary">{sessionJustClosed.session.itemsCount} dishes</span>
                 </div>
                 <div className="border-t border-border pt-2 flex justify-between text-sm">
-                  <span className="font-bold text-text-primary">Consolidated Total:</span>
-                  <span className="font-serif font-bold text-text-primary text-base">
+                  <span className="font-medium text-text-primary">Consolidated Total</span>
+                  <span className="font-mono tabular-nums font-semibold text-text-primary text-base">
                     {formatCurrency(sessionJustClosed.session.totalAmount)}
                   </span>
                 </div>
@@ -1651,7 +1651,7 @@ export default function ManagerOrdersPage() {
               <button
                 type="button"
                 onClick={() => setSessionJustClosed(null)}
-                className="px-4 py-2 border border-border rounded-sm text-xs font-bold uppercase tracking-wider text-text-secondary hover:bg-border/30"
+                className="px-4 py-2 border border-border rounded-sm text-xs font-medium text-text-secondary hover:bg-bg-secondary"
               >
                 Done
               </button>
@@ -1662,9 +1662,9 @@ export default function ManagerOrdersPage() {
                   setSessionJustClosed(null);
                   handlePrintConsolidatedBill(target.session, target.session.id, target.orders);
                 }}
-                className="px-5 py-2 bg-text-primary hover:bg-black text-white rounded-sm text-xs font-bold uppercase tracking-wider shadow-xs flex items-center gap-1.5"
+                className="px-5 py-2 bg-text-primary hover:bg-text-primary/90 text-bg-primary rounded-sm text-xs font-medium flex items-center gap-1.5"
               >
-                <Printer className="w-4 h-4 text-accent" />
+                <Printer className="w-4 h-4" />
                 Print Complete Bill
               </button>
             </div>
@@ -1733,37 +1733,37 @@ export default function ManagerOrdersPage() {
 
             {/* Quick Action Bar to Add New Menu Items (or Locked Banner if session closed) */}
             {isEditingSessionClosed ? (
-              <div className="px-5 py-3 bg-neutral-100 border-b border-border flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-xs text-neutral-700">
-                  <Lock className="w-4 h-4 text-neutral-500 shrink-0" />
+              <div className="px-5 py-3 bg-bg-secondary border-b border-border flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs text-text-secondary">
+                  <Lock className="w-4 h-4 text-text-muted shrink-0" />
                   <span>
-                    <strong>Session Closed:</strong> This table session has been closed. Adding items and editing dishes are disabled.
+                    <strong className="text-text-primary">Session Closed:</strong> This table session has been closed. Adding items and editing dishes are disabled.
                   </span>
                 </div>
                 <button
                   type="button"
                   disabled
-                  className="shrink-0 px-3.5 py-1.5 bg-neutral-200 text-neutral-500 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-not-allowed"
+                  className="shrink-0 px-3.5 py-1.5 bg-border text-text-muted rounded-sm text-xs font-medium flex items-center gap-1.5 cursor-not-allowed"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  + Add Item
+                  Add Item
                 </button>
               </div>
             ) : (
-              <div className="px-5 py-3 bg-amber-50/60 border-b border-amber-200/70 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-xs text-amber-900">
+              <div className="px-5 py-3 bg-bg-secondary border-b border-border flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs text-text-secondary">
                   <Utensils className="w-4 h-4 text-accent shrink-0" />
                   <span>
-                    <strong>Need to add extra dishes?</strong> Browse the live restaurant menu and add items directly to this tab.
+                    <strong className="text-text-primary">Add extra dishes:</strong> Browse the restaurant menu to append items to this tab.
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsAddMenuModalOpen(true)}
-                  className="shrink-0 px-3.5 py-1.5 bg-accent hover:bg-accent-hover text-white rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition-colors"
+                  className="shrink-0 px-3.5 py-1.5 bg-accent hover:bg-accent-hover text-white rounded-sm text-xs font-medium flex items-center gap-1.5 transition-colors"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  + Add Item
+                  Add Item
                 </button>
               </div>
             )}
@@ -1776,7 +1776,7 @@ export default function ManagerOrdersPage() {
                   <span>{editError}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between text-xs text-text-secondary font-bold uppercase tracking-wider pb-1 border-b border-border/50">
+              <div className="flex items-center justify-between text-xs text-text-secondary font-medium pb-1 border-b border-border">
                 <span>Ordered Dishes ({editItems.reduce((s, i) => s + i.quantity, 0)} total)</span>
                 <span>Price & Quantity</span>
               </div>
@@ -1784,12 +1784,12 @@ export default function ManagerOrdersPage() {
               {editItems.length === 0 ? (
                 <div className="py-8 text-center bg-bg-primary rounded-sm border border-dashed border-border">
                   <Utensils className="w-8 h-8 text-text-muted mx-auto mb-2" />
-                  <p className="text-sm font-semibold text-text-primary">No dishes on this ticket</p>
+                  <p className="text-sm font-medium text-text-primary">No dishes on this ticket</p>
                   <p className="text-xs text-text-muted mb-3">Add items from the menu to populate this order.</p>
                   <button
                     type="button"
                     onClick={() => setIsAddMenuModalOpen(true)}
-                    className="px-4 py-2 bg-text-primary text-white text-xs font-bold uppercase tracking-wider rounded-sm hover:bg-black inline-flex items-center gap-1.5"
+                    className="px-4 py-2 bg-text-primary text-bg-primary text-xs font-medium rounded-sm hover:bg-text-primary/90 inline-flex items-center gap-1.5"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     Browse Menu to Add Dishes
@@ -1802,66 +1802,65 @@ export default function ManagerOrdersPage() {
                   return (
                     <div
                       key={item.cartItemId}
-                      className={`flex items-center justify-between p-3 rounded-sm border transition-all ${
+                      className={`flex items-center justify-between p-3 rounded-sm border transition-colors ${
                         isNewItem
-                          ? 'bg-emerald-50/50 border-emerald-200'
-                          : 'bg-[#FAF9F8] border-border/60 hover:border-border'
+                          ? 'bg-emerald-50/40 border-emerald-200'
+                          : 'bg-bg-primary border-border'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         {item.image ? (
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="w-12 h-12 rounded object-cover border border-border/50 shrink-0"
+                            className="w-12 h-12 rounded-sm object-cover border border-border shrink-0"
                             onError={(e) => {
-                              // Fallback on image error
                               (e.target as HTMLElement).style.display = 'none';
                             }}
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded bg-border/30 flex items-center justify-center text-text-muted shrink-0">
+                          <div className="w-12 h-12 rounded-sm bg-bg-secondary flex items-center justify-center text-text-muted shrink-0">
                             <Utensils className="w-5 h-5" />
                           </div>
                         )}
 
-                        <div>
+                        <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-text-primary block">
+                            <span className="text-sm font-medium text-text-primary block truncate">
                               {item.name}
                             </span>
                             {isNewItem && (
-                              <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.2 rounded-full border border-emerald-200">
-                                + Added
+                              <span className="text-xs text-emerald-700 font-medium shrink-0">
+                                · Added
                               </span>
                             )}
                           </div>
-                          <span className="text-xs text-text-muted">
+                          <span className="text-xs font-mono tabular-nums text-text-muted">
                             {formatCurrency(item.price)} each
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 shrink-0">
                         {/* Stepper */}
                         <div className="flex items-center gap-1 bg-white border border-border rounded-sm p-0.5">
                           <button
                             type="button"
                             disabled={isEditingSessionClosed}
                             onClick={() => handleUpdateItemQuantity(item.cartItemId, item.quantity - 1)}
-                            className="w-7 h-7 rounded flex items-center justify-center hover:bg-border/30 text-text-secondary disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="w-7 h-7 rounded-sm flex items-center justify-center hover:bg-bg-secondary text-text-secondary disabled:opacity-40 disabled:cursor-not-allowed"
                             title="Decrease quantity"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
-                          <span className="text-sm font-bold w-7 text-center font-mono">
+                          <span className="text-sm font-medium w-7 text-center font-mono tabular-nums">
                             {item.quantity}
                           </span>
                           <button
                             type="button"
                             disabled={isEditingSessionClosed}
                             onClick={() => handleUpdateItemQuantity(item.cartItemId, item.quantity + 1)}
-                            className="w-7 h-7 rounded flex items-center justify-center hover:bg-border/30 text-text-secondary disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="w-7 h-7 rounded-sm flex items-center justify-center hover:bg-bg-secondary text-text-secondary disabled:opacity-40 disabled:cursor-not-allowed"
                             title="Increase quantity"
                           >
                             <Plus className="w-3 h-3" />
@@ -1869,7 +1868,7 @@ export default function ManagerOrdersPage() {
                         </div>
 
                         {/* Line Total */}
-                        <span className="text-sm font-serif font-bold text-text-primary w-20 text-end">
+                        <span className="text-sm font-mono tabular-nums font-medium text-text-primary w-20 text-end">
                           {formatCurrency(item.price * item.quantity)}
                         </span>
 
@@ -1878,7 +1877,7 @@ export default function ManagerOrdersPage() {
                           type="button"
                           disabled={isEditingSessionClosed}
                           onClick={() => handleRemoveItem(item.cartItemId)}
-                          className="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="text-red-600 hover:text-red-700 p-1 rounded-sm hover:bg-red-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                           title="Remove item from order"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1891,7 +1890,7 @@ export default function ManagerOrdersPage() {
 
               {/* Kitchen Notes Input */}
               <div className="mt-4 pt-3 border-t border-border">
-                <label className="text-xs font-bold uppercase tracking-wider text-text-secondary block mb-1.5">
+                <label className="text-xs font-medium text-text-secondary block mb-1.5">
                   Kitchen Instructions / Special Prep Note
                 </label>
                 <textarea
@@ -1905,26 +1904,26 @@ export default function ManagerOrdersPage() {
               </div>
 
               {/* Financial Calculation Summary */}
-              <div className="bg-[#FAF9F8] p-4 rounded-sm border border-border space-y-2 text-xs mt-3">
+              <div className="bg-bg-primary p-4 rounded-sm border border-border space-y-2 text-xs mt-3">
                 <div className="flex justify-between text-text-secondary">
-                  <span>Order Subtotal:</span>
-                  <span className="font-semibold text-text-primary">
+                  <span>Order Subtotal</span>
+                  <span className="font-mono tabular-nums font-medium text-text-primary">
                     {formatCurrency(calculateEditTotal())}
                   </span>
                 </div>
                 <div className="flex justify-between text-text-secondary">
-                  <span>Applicable GST (5% inclusive):</span>
-                  <span className="font-medium text-text-muted">
+                  <span>Applicable GST (5% inclusive)</span>
+                  <span className="font-mono tabular-nums text-text-muted">
                     {formatCurrency((calculateEditTotal() * 5) / 105)} (Included)
                   </span>
                 </div>
                 <div className="flex justify-between text-text-secondary">
-                  <span>Applicable Discounts:</span>
-                  <span className="font-medium text-text-muted">₹0.00</span>
+                  <span>Applicable Discounts</span>
+                  <span className="font-mono tabular-nums text-text-muted">₹0.00</span>
                 </div>
                 <div className="border-t border-border pt-2 flex justify-between items-baseline text-sm">
-                  <span className="font-bold text-text-primary">Final Grand Total:</span>
-                  <span className="font-serif font-bold text-text-primary text-xl">
+                  <span className="font-medium text-text-primary">Final Grand Total</span>
+                  <span className="font-mono tabular-nums font-semibold text-text-primary text-lg">
                     {formatCurrency(calculateEditTotal())}
                   </span>
                 </div>
@@ -1932,15 +1931,15 @@ export default function ManagerOrdersPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-border bg-[#FAF9F8] flex flex-wrap items-center justify-between gap-3">
+            <div className="p-4 border-t border-border bg-bg-primary flex flex-wrap items-center justify-between gap-3">
               <button
                 type="button"
                 disabled={isEditingSessionClosed}
                 onClick={() => setIsAddMenuModalOpen(true)}
-                className="px-3.5 py-2 border border-border bg-white hover:bg-neutral-50 text-text-primary rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3.5 py-2 border border-border bg-white hover:bg-bg-secondary text-text-primary rounded-sm text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus className="w-3.5 h-3.5 text-accent" />
-                + Add More Dishes
+                Add More Dishes
               </button>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -1949,7 +1948,7 @@ export default function ManagerOrdersPage() {
                     type="button"
                     onClick={() => handleRequestDeleteOrder(editingOrder)}
                     disabled={isSavingEdit}
-                    className="px-3.5 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors"
+                    className="px-3.5 py-2 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 rounded-sm text-xs font-medium flex items-center gap-1.5 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Delete Order
@@ -1963,7 +1962,7 @@ export default function ManagerOrdersPage() {
                     setIsAddMenuModalOpen(false);
                   }}
                   disabled={isSavingEdit}
-                  className="px-4 py-2 border border-border rounded-sm text-xs font-bold uppercase tracking-wider text-text-secondary hover:bg-border/30 transition-colors"
+                  className="px-4 py-2 border border-border rounded-sm text-xs font-medium text-text-secondary hover:bg-bg-secondary transition-colors"
                 >
                   {isEditingSessionClosed ? 'Close' : 'Cancel'}
                 </button>
@@ -1972,7 +1971,7 @@ export default function ManagerOrdersPage() {
                   type="button"
                   onClick={handleSaveEdit}
                   disabled={isSavingEdit || editItems.length === 0 || isEditingSessionClosed}
-                  className="px-4 py-2 bg-white border border-text-primary text-text-primary rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-neutral-50 flex items-center gap-1.5 shadow-2xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 bg-white border border-text-primary text-text-primary rounded-sm text-xs font-medium hover:bg-bg-secondary flex items-center gap-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-3.5 h-3.5" />
                   {isSavingEdit ? 'Saving...' : 'Save Changes'}
@@ -1983,7 +1982,7 @@ export default function ManagerOrdersPage() {
                     type="button"
                     onClick={handleSaveAndConfirmEdit}
                     disabled={isSavingEdit || editItems.length === 0 || isEditingSessionClosed}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-sm text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ChefHat className="w-3.5 h-3.5" />
                     {isSavingEdit ? 'Confirming...' : 'Save & Confirm Order'}
@@ -2043,15 +2042,15 @@ export default function ManagerOrdersPage() {
                 )}
               </div>
 
-              {/* Category Pills */}
+              {/* Category Tabs */}
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
                 <button
                   type="button"
                   onClick={() => setSelectedCategoryTab('all')}
-                  className={`px-3 py-1.5 rounded-sm font-bold uppercase tracking-wider shrink-0 transition-all ${
+                  className={`px-3 py-1.5 rounded-sm font-medium shrink-0 transition-colors ${
                     selectedCategoryTab === 'all'
-                      ? 'bg-text-primary text-white shadow-xs'
-                      : 'bg-border/30 text-text-secondary hover:bg-border/60'
+                      ? 'bg-text-primary text-bg-primary'
+                      : 'bg-bg-secondary text-text-secondary hover:text-text-primary'
                   }`}
                 >
                   All Dishes ({allMenuItems.length})
@@ -2061,10 +2060,10 @@ export default function ManagerOrdersPage() {
                     key={cat.id}
                     type="button"
                     onClick={() => setSelectedCategoryTab(cat.id)}
-                    className={`px-3 py-1.5 rounded-sm font-bold uppercase tracking-wider shrink-0 transition-all ${
+                    className={`px-3 py-1.5 rounded-sm font-medium shrink-0 transition-colors ${
                       selectedCategoryTab === cat.id
-                        ? 'bg-text-primary text-white shadow-xs'
-                        : 'bg-border/30 text-text-secondary hover:bg-border/60'
+                        ? 'bg-text-primary text-bg-primary'
+                        : 'bg-bg-secondary text-text-secondary hover:text-text-primary'
                     }`}
                   >
                     {cat.name} ({cat.items ? cat.items.length : 0})
@@ -2074,12 +2073,12 @@ export default function ManagerOrdersPage() {
             </div>
 
             {/* Ticket Snapshot Bar */}
-            <div className="px-4 py-2 bg-bg-primary border-b border-border/80 flex items-center justify-between text-xs">
+            <div className="px-4 py-2 bg-bg-primary border-b border-border flex items-center justify-between text-xs">
               <span className="text-text-secondary">
-                Currently on Ticket: <strong>{editItems.reduce((s, i) => s + i.quantity, 0)} items</strong> ({editItems.length} distinct dishes)
+                Currently on Ticket: <strong className="font-mono tabular-nums text-text-primary">{editItems.reduce((s, i) => s + i.quantity, 0)} items</strong> ({editItems.length} distinct dishes)
               </span>
-              <span className="font-bold text-text-primary">
-                Current Total: <span className="font-serif text-accent">{formatCurrency(calculateEditTotal())}</span>
+              <span className="font-medium text-text-primary">
+                Total <span className="font-mono tabular-nums font-semibold text-accent">{formatCurrency(calculateEditTotal())}</span>
               </span>
             </div>
 
@@ -2095,7 +2094,7 @@ export default function ManagerOrdersPage() {
                       setMenuSearchQuery('');
                       setSelectedCategoryTab('all');
                     }}
-                    className="mt-2 text-xs text-accent font-bold uppercase underline"
+                    className="mt-2 text-xs text-accent font-medium underline"
                   >
                     Reset Search & Filters
                   </button>
@@ -2110,11 +2109,11 @@ export default function ManagerOrdersPage() {
                     return (
                       <div
                         key={menuItem.id}
-                        className={`p-3 rounded-sm border flex items-center justify-between gap-3 transition-all ${
+                        className={`p-3 rounded-sm border flex items-center justify-between gap-3 transition-colors ${
                           !isAvailable
-                            ? 'bg-neutral-100/70 border-border/50 opacity-60'
+                            ? 'bg-bg-secondary border-border opacity-60'
                             : currentQty > 0
-                            ? 'bg-emerald-50/40 border-emerald-300 shadow-2xs'
+                            ? 'bg-emerald-50/30 border-emerald-300'
                             : 'bg-white border-border hover:border-text-secondary/50'
                         }`}
                       >
@@ -2123,45 +2122,38 @@ export default function ManagerOrdersPage() {
                             <img
                               src={menuItem.image}
                               alt={menuItem.name}
-                              className="w-16 h-16 rounded object-cover border border-border/50 shrink-0"
+                              className="w-16 h-16 rounded-sm object-cover border border-border shrink-0"
                               onError={(e) => {
                                 (e.target as HTMLElement).style.display = 'none';
                               }}
                             />
                           ) : (
-                            <div className="w-16 h-16 rounded bg-border/20 flex items-center justify-center text-text-muted shrink-0">
+                            <div className="w-16 h-16 rounded-sm bg-bg-secondary flex items-center justify-center text-text-muted shrink-0">
                               <Utensils className="w-6 h-6" />
                             </div>
                           )}
 
                           <div className="min-w-0">
-                            <span className="text-xs font-bold uppercase tracking-wider text-accent block truncate">
+                            <span className="text-[11px] font-medium text-accent block truncate">
                               {menuItem.categoryName}
                             </span>
-                            <h4 className="text-sm font-bold text-text-primary leading-tight truncate">
+                            <h4 className="text-sm font-semibold text-text-primary leading-tight truncate">
                               {menuItem.name}
                             </h4>
                             <div className="flex items-center gap-2 mt-1">
-                              <span className="text-sm font-serif font-bold text-text-primary">
+                              <span className="text-sm font-mono tabular-nums font-medium text-text-primary">
                                 {formatCurrency(menuItem.price)}
                               </span>
                               {menuItem.calories && (
-                                <span className="text-[10px] text-text-muted">
-                                  {menuItem.calories} kcal
+                                <span className="text-[11px] font-mono tabular-nums text-text-muted">
+                                  · {menuItem.calories} kcal
                                 </span>
                               )}
                             </div>
                             {menuItem.tags && menuItem.tags.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {menuItem.tags.slice(0, 2).map((tag) => (
-                                  <span
-                                    key={tag.id}
-                                    className={`text-[9px] px-1.5 py-0.2 rounded border font-semibold ${tag.color}`}
-                                  >
-                                    {tag.label}
-                                  </span>
-                                ))}
-                              </div>
+                              <p className="text-[11px] text-text-muted mt-0.5 truncate">
+                                {menuItem.tags.slice(0, 2).map((t) => t.label).join(' · ')}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -2169,41 +2161,41 @@ export default function ManagerOrdersPage() {
                         {/* Actions */}
                         <div className="shrink-0 flex flex-col items-end gap-1.5">
                           {!isAvailable ? (
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50 border border-red-200 px-2 py-1 rounded">
+                            <span className="text-xs font-medium text-red-700">
                               Out of Stock
                             </span>
                           ) : currentQty > 0 ? (
                             <div className="flex flex-col items-end gap-1">
-                              <div className="flex items-center gap-1 bg-white border border-emerald-300 rounded-sm p-0.5 shadow-2xs">
+                              <div className="flex items-center gap-1 bg-white border border-emerald-300 rounded-sm p-0.5">
                                 <button
                                   type="button"
                                   onClick={() => handleSetMenuItemQuantityInOrder(menuItem.id, currentQty - 1, menuItem)}
-                                  className="w-6 h-6 rounded flex items-center justify-center hover:bg-emerald-50 text-emerald-900"
+                                  className="w-6 h-6 rounded-sm flex items-center justify-center hover:bg-emerald-50 text-emerald-900"
                                   title="Decrease"
                                 >
                                   <Minus className="w-3 h-3" />
                                 </button>
-                                <span className="text-xs font-bold w-6 text-center font-mono text-emerald-900">
+                                <span className="text-xs font-medium w-6 text-center font-mono tabular-nums text-emerald-900">
                                   {currentQty}
                                 </span>
                                 <button
                                   type="button"
                                   onClick={() => handleAddMenuItemToOrder(menuItem, 1)}
-                                  className="w-6 h-6 rounded flex items-center justify-center hover:bg-emerald-50 text-emerald-900"
+                                  className="w-6 h-6 rounded-sm flex items-center justify-center hover:bg-emerald-50 text-emerald-900"
                                   title="Add one more"
                                 >
                                   <Plus className="w-3 h-3" />
                                 </button>
                               </div>
-                              <span className="text-[10px] font-bold text-emerald-700 flex items-center gap-0.5">
-                                <Check className="w-3 h-3" /> Added to tab
+                              <span className="text-[11px] font-medium text-emerald-700 flex items-center gap-0.5">
+                                <Check className="w-3 h-3" /> On tab
                               </span>
                             </div>
                           ) : (
                             <button
                               type="button"
                               onClick={() => handleAddMenuItemToOrder(menuItem, 1)}
-                              className="px-3.5 py-1.5 bg-text-primary hover:bg-black text-white rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1 shadow-2xs transition-all"
+                              className="px-3.5 py-1.5 bg-text-primary hover:bg-text-primary/90 text-bg-primary rounded-sm text-xs font-medium flex items-center gap-1 transition-colors"
                             >
                               <Plus className="w-3.5 h-3.5" />
                               Add
@@ -2218,10 +2210,10 @@ export default function ManagerOrdersPage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-border bg-[#FAF9F8] flex items-center justify-between gap-3">
+            <div className="p-4 border-t border-border bg-bg-primary flex items-center justify-between gap-3">
               <div className="text-xs text-text-secondary">
-                <span>Total Items Selected: </span>
-                <strong className="text-text-primary">
+                <span>Selected: </span>
+                <strong className="font-mono tabular-nums text-text-primary">
                   {editItems.reduce((s, i) => s + i.quantity, 0)} ({formatCurrency(calculateEditTotal())})
                 </strong>
               </div>
@@ -2229,10 +2221,10 @@ export default function ManagerOrdersPage() {
               <button
                 type="button"
                 onClick={() => setIsAddMenuModalOpen(false)}
-                className="px-5 py-2.5 bg-text-primary hover:bg-black text-white rounded-sm text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition-colors"
+                className="px-5 py-2 bg-text-primary hover:bg-text-primary/90 text-bg-primary rounded-sm text-xs font-medium flex items-center gap-1.5 transition-colors"
               >
-                <Check className="w-4 h-4 text-accent" />
-                Done Adding (Review Order)
+                <Check className="w-4 h-4" />
+                Done Adding
               </button>
             </div>
           </div>
@@ -2242,11 +2234,11 @@ export default function ManagerOrdersPage() {
       {/* Delete Order Confirmation Modal */}
       {deletingOrder && (
         <div className="fixed inset-0 z-70 bg-black/65 flex items-center justify-center p-4">
-          <div className="bg-white rounded-sm max-w-md w-full p-6 shadow-2xl border border-border animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-sm max-w-md w-full p-6 border border-border">
             <div className="flex items-center justify-between pb-4 border-b border-border mb-4">
               <div className="flex items-center gap-2 text-red-700">
                 <Trash2 className="w-5 h-5" />
-                <h3 className="font-serif text-xl font-bold text-text-primary">Delete Pending Order</h3>
+                <h3 className="font-serif text-xl font-semibold text-text-primary">Delete Pending Order</h3>
               </div>
               <button
                 type="button"
@@ -2261,7 +2253,7 @@ export default function ManagerOrdersPage() {
             <div className="space-y-3 mb-6">
               <p className="text-sm text-text-secondary">
                 Are you sure you want to permanently delete Order{' '}
-                <span className="font-mono font-bold text-text-primary">#{deletingOrder.id}</span>? This order will be completely removed from the table session and excluded from the final bill.
+                <span className="font-mono tabular-nums font-semibold text-text-primary">#{deletingOrder.id}</span>? This order will be completely removed from the table session and excluded from the final bill.
               </p>
 
               {deleteError && (
@@ -2273,32 +2265,34 @@ export default function ManagerOrdersPage() {
 
               <div className="bg-bg-primary p-4 rounded-sm border border-border space-y-2 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-text-secondary">Table:</span>
-                  <span className="font-semibold text-text-primary">
+                  <span className="text-text-secondary">Table</span>
+                  <span className="font-medium text-text-primary">
                     {deletingOrder.tableName || (deletingOrder.tableId && deletingOrder.tableId !== 'COUNTER' ? `Table ${deletingOrder.tableId}` : 'Counter')}
                   </span>
                 </div>
                 {deletingOrder.customerPhone && (
                   <div className="flex justify-between">
-                    <span className="text-text-secondary">Customer:</span>
-                    <span className="font-mono text-text-primary">{maskPhone(deletingOrder.customerPhone)}</span>
+                    <span className="text-text-secondary">Customer</span>
+                    <span className="font-mono tabular-nums text-text-primary">{maskPhone(deletingOrder.customerPhone)}</span>
                   </div>
                 )}
-                <div className="border-t border-border/60 pt-2 space-y-1">
+                <div className="border-t border-border pt-2 space-y-1">
                   {(deletingOrder.items || []).map((item) => (
                     <div key={item.cartItemId} className="flex justify-between">
-                      <span className="text-text-primary">{item.quantity}x {item.name}</span>
-                      <span className="text-text-secondary">{formatCurrency(item.price * item.quantity)}</span>
+                      <span className="text-text-primary">
+                        <span className="font-mono tabular-nums">{item.quantity}×</span> {item.name}
+                      </span>
+                      <span className="font-mono tabular-nums text-text-secondary">{formatCurrency(item.price * item.quantity)}</span>
                     </div>
                   ))}
                 </div>
-                <div className="border-t border-border pt-2 flex justify-between text-sm font-bold text-text-primary">
-                  <span>Order Total to Remove:</span>
-                  <span className="font-serif text-red-700">{formatCurrency(deletingOrder.total)}</span>
+                <div className="border-t border-border pt-2 flex justify-between text-sm font-medium text-text-primary">
+                  <span>Order Total to Remove</span>
+                  <span className="font-mono tabular-nums font-semibold text-red-700">{formatCurrency(deletingOrder.total)}</span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-text-muted italic">
+              <p className="text-xs text-text-muted">
                 Other orders placed at this table will remain unaffected. This action cannot be undone.
               </p>
             </div>
@@ -2308,7 +2302,7 @@ export default function ManagerOrdersPage() {
                 type="button"
                 onClick={() => setDeletingOrder(null)}
                 disabled={isDeletingOrder}
-                className="px-4 py-2 border border-border rounded-sm text-xs font-bold uppercase tracking-wider text-text-secondary hover:bg-border/30"
+                className="px-4 py-2 border border-border rounded-sm text-xs font-medium text-text-secondary hover:bg-bg-secondary"
               >
                 Cancel
               </button>
@@ -2316,7 +2310,7 @@ export default function ManagerOrdersPage() {
                 type="button"
                 onClick={handleConfirmDeleteOrder}
                 disabled={isDeletingOrder}
-                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-sm text-xs font-bold uppercase tracking-wider shadow-xs flex items-center gap-1.5 disabled:opacity-60"
+                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-sm text-xs font-medium flex items-center gap-1.5 disabled:opacity-60"
               >
                 {isDeletingOrder ? (
                   <>

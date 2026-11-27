@@ -6,11 +6,7 @@ import {
   Filter, 
   ArrowUpDown, 
   Calendar, 
-  Clock, 
-  CalendarRange, 
-  ChevronRight,
-  TrendingUp,
-  Receipt
+  CalendarRange
 } from 'lucide-react';
 import { 
   DateFilterState, 
@@ -173,19 +169,20 @@ export default function OrderManager() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-serif text-text-primary">Order Management</h1>
+          <h1 className="text-2xl sm:text-3xl font-serif font-medium text-text-primary tracking-tight">
+            Order Management
+          </h1>
           <p className="text-sm text-text-secondary mt-1">
             Track, filter, and update dine-in table and counter orders in real time.
           </p>
         </div>
 
         {/* Controls: Table Filter & Sort Dropdown */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Table Filter */}
-          <div className="flex items-center gap-2 bg-white border border-border px-3 py-2 rounded-sm shadow-xs">
-            <Filter className="w-4 h-4 text-text-muted" />
-            <label htmlFor="table-filter" className="text-xs font-bold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-              Table:
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex items-center gap-2 bg-white border border-border px-3 py-2 rounded-sm">
+            <Filter className="w-3.5 h-3.5 text-text-muted shrink-0" />
+            <label htmlFor="table-filter" className="text-xs font-medium text-text-muted whitespace-nowrap">
+              Table
             </label>
             <select
               id="table-filter"
@@ -207,17 +204,16 @@ export default function OrderManager() {
             </select>
           </div>
 
-          {/* Sort Dropdown: Newest first / Oldest first / Total High-Low */}
-          <div className="flex items-center gap-2 bg-white border border-border px-3 py-2 rounded-sm shadow-xs">
-            <ArrowUpDown className="w-4 h-4 text-text-muted" />
-            <label htmlFor="sort-order" className="text-xs font-bold uppercase tracking-wider text-text-secondary whitespace-nowrap">
-              Sort:
+          <div className="flex items-center gap-2 bg-white border border-border px-3 py-2 rounded-sm">
+            <ArrowUpDown className="w-3.5 h-3.5 text-text-muted shrink-0" />
+            <label htmlFor="sort-order" className="text-xs font-medium text-text-muted whitespace-nowrap">
+              Sort
             </label>
             <select
               id="sort-order"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortOptionType)}
-              className="bg-transparent text-xs font-medium text-text-primary outline-none cursor-pointer font-sans"
+              className="bg-transparent text-xs font-medium text-text-primary outline-none cursor-pointer"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
@@ -228,15 +224,14 @@ export default function OrderManager() {
       </div>
 
       {/* Date Filter Bar */}
-      <div className="bg-white border border-border rounded-sm p-4 shadow-xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-text-secondary flex items-center gap-1.5 me-2">
-              <Calendar className="w-4 h-4 text-accent" />
-              <span>Date Filter:</span>
+      <div className="bg-white border border-border rounded-sm p-4 space-y-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-medium text-text-muted flex items-center gap-1.5 me-2">
+              <Calendar className="w-3.5 h-3.5 text-accent" />
+              <span>Range</span>
             </span>
 
-            {/* Presets: Today, Last 7 days, Last 30 days, Custom range, All Time */}
             {DATE_PRESETS.map((preset) => {
               const isActive = dateFilter.type === preset.id;
               return (
@@ -244,10 +239,10 @@ export default function OrderManager() {
                   key={preset.id}
                   type="button"
                   onClick={() => handleDatePresetClick(preset.id)}
-                  className={`px-3.5 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-all ${
+                  className={`px-3 py-1.5 rounded-sm text-xs font-medium transition-colors whitespace-nowrap ${
                     isActive
-                      ? 'bg-text-primary text-white shadow-xs'
-                      : 'bg-bg-primary text-text-secondary hover:text-text-primary hover:bg-neutral-200/70 border border-border/60'
+                      ? 'bg-text-primary text-bg-primary'
+                      : 'bg-bg-primary text-text-secondary hover:text-text-primary border border-border'
                   }`}
                 >
                   {preset.label}
@@ -256,10 +251,10 @@ export default function OrderManager() {
             })}
           </div>
 
-          {/* Custom Date Range Pickers (shown when custom is selected) */}
+          {/* Custom Date Range Pickers */}
           {dateFilter.type === 'custom' && (
-            <div className="flex flex-wrap items-center gap-2 bg-bg-primary p-2 rounded-sm border border-border animate-in fade-in duration-150">
-              <CalendarRange className="w-4 h-4 text-text-muted shrink-0" />
+            <div className="flex flex-wrap items-center gap-2 bg-bg-primary px-3 py-1.5 rounded-sm border border-border">
+              <CalendarRange className="w-3.5 h-3.5 text-text-muted shrink-0" />
               <div className="flex items-center gap-2 text-xs">
                 <input
                   type="date"
@@ -267,78 +262,52 @@ export default function OrderManager() {
                   onChange={(e) =>
                     setDateFilter(prev => ({ ...prev, startDate: e.target.value }))
                   }
-                  className="bg-white border border-border px-2.5 py-1 rounded-sm text-xs text-text-primary outline-none focus:border-text-secondary"
+                  className="bg-white border border-border px-2 py-1 rounded-sm text-xs font-mono text-text-primary outline-none focus:border-text-primary"
                   aria-label="Start Date"
                 />
-                <span className="text-text-muted font-bold">—</span>
+                <span className="text-text-muted">—</span>
                 <input
                   type="date"
                   value={dateFilter.endDate || ''}
                   onChange={(e) =>
                     setDateFilter(prev => ({ ...prev, endDate: e.target.value }))
                   }
-                  className="bg-white border border-border px-2.5 py-1 rounded-sm text-xs text-text-primary outline-none focus:border-text-secondary"
+                  className="bg-white border border-border px-2 py-1 rounded-sm text-xs font-mono text-text-primary outline-none focus:border-text-primary"
                   aria-label="End Date"
                 />
               </div>
             </div>
           )}
         </div>
-      </div>
 
-      {/* Table Summary Bar & Filter Chips & Counts Per Day */}
-      <div className="bg-white border border-border rounded-sm p-4 shadow-xs space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs border-b border-border/60 pb-3">
-          {/* Active Filter Chips */}
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
-              Active Filters:
+        {/* Unboxed Summary Strip & Daily Breakdown */}
+        <div className="pt-3 border-t border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-text-secondary">
+            <span className="font-mono tabular-nums font-medium text-text-primary">
+              {sortedOrders.length} {sortedOrders.length === 1 ? 'order' : 'orders'}
             </span>
-            
-            {/* Date filter chip */}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-accent/10 text-accent border border-accent/20">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>
-                {dateFilter.type === 'today' && 'Today'}
-                {dateFilter.type === '7days' && 'Last 7 days'}
-                {dateFilter.type === '30days' && 'Last 30 days'}
-                {dateFilter.type === 'custom' && `${dateFilter.startDate || 'Start'} to ${dateFilter.endDate || 'End'}`}
-                {dateFilter.type === 'all' && 'All Time'}
-              </span>
+            <span className="text-text-muted" aria-hidden="true">·</span>
+            <span className="font-mono tabular-nums font-medium text-text-primary">
+              {formatCurrency(totalSales)} payable
             </span>
-
-            {/* Table filter chip */}
             {tableFilter !== 'all' && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                <Filter className="w-3.5 h-3.5" />
-                <span>Table: {tableFilter}</span>
-              </span>
+              <>
+                <span className="text-text-muted" aria-hidden="true">·</span>
+                <span>Table {tableFilter}</span>
+              </>
             )}
-
-            {/* Sort chip */}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-neutral-100 text-neutral-700 border border-border">
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              <span>
-                {sortBy === 'newest' && 'Newest first'}
-                {sortBy === 'oldest' && 'Oldest first'}
-                {sortBy === 'total-high-low' && 'Total High-Low'}
-              </span>
-            </span>
-
-            {/* Total Results Chip */}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-text-primary text-white">
-              <Receipt className="w-3.5 h-3.5" />
-              <span>{sortedOrders.length} {sortedOrders.length === 1 ? 'Order' : 'Orders'}</span>
-            </span>
-
-            {/* Total Volume */}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-              <span>{formatCurrency(totalSales)}</span>
-            </span>
+            {Object.keys(countsPerDay).length > 0 && (
+              <>
+                <span className="text-text-muted" aria-hidden="true">·</span>
+                <span className="font-mono tabular-nums text-text-muted">
+                  {Object.entries(countsPerDay)
+                    .map(([dateStr, count]) => `${dateStr}: ${count}`)
+                    .join(' / ')}
+                </span>
+              </>
+            )}
           </div>
 
-          {/* Quick reset */}
           {(dateFilter.type !== 'today' || tableFilter !== 'all' || sortBy !== 'newest') && (
             <button
               type="button"
@@ -347,44 +316,19 @@ export default function OrderManager() {
                 setTableFilter('all');
                 setSortBy('newest');
               }}
-              className="text-[10px] font-bold uppercase tracking-wider text-accent hover:underline cursor-pointer"
+              className="text-xs font-medium text-accent hover:text-text-primary transition-colors self-start sm:self-auto whitespace-nowrap"
             >
               Reset Filters
             </button>
           )}
         </div>
-
-        {/* Counts Per Day Chips */}
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block mb-2">
-            Counts Per Day:
-          </span>
-          <div className="flex flex-wrap items-center gap-2">
-            {Object.keys(countsPerDay).length === 0 ? (
-              <span className="text-xs text-text-muted italic">No orders found for the selected date range</span>
-            ) : (
-              Object.entries(countsPerDay).map(([dateStr, count]) => (
-                <span
-                  key={dateStr}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs font-medium bg-bg-primary text-text-primary border border-border shadow-2xs"
-                >
-                  <Calendar className="w-3.5 h-3.5 text-accent" />
-                  <span className="font-semibold">{dateStr}:</span>
-                  <span className="px-2 py-0.5 rounded-full bg-text-primary text-white text-[10px] font-bold">
-                    {count} {count === 1 ? 'order' : 'orders'}
-                  </span>
-                </span>
-              ))
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Orders Table */}
-      <div className="bg-white border border-border rounded-sm overflow-hidden shadow-xs">
+      <div className="bg-white border border-border rounded-sm overflow-hidden">
         {sortedOrders.length === 0 ? (
           <div className="p-12 text-center text-text-secondary">
-            <p className="font-serif text-lg mb-1">No orders found</p>
+            <p className="font-serif text-lg text-text-primary mb-1">No orders found</p>
             <p className="text-xs text-text-muted">
               {orders.length === 0 
                 ? 'No orders have been recorded yet.' 
@@ -392,136 +336,126 @@ export default function OrderManager() {
             </p>
           </div>
         ) : (
-          <table className="w-full text-left">
-            <thead className="bg-bg-primary border-b border-border text-xs uppercase tracking-widest text-text-muted">
-              <tr>
-                <th className="px-6 py-4 font-bold">Order ID</th>
-                <th className="px-6 py-4 font-bold">Table</th>
-                <th className="px-6 py-4 font-bold">Date & Time</th>
-                <th className="px-6 py-4 font-bold">Items</th>
-                <th className="px-6 py-4 font-bold">Total</th>
-                <th className="px-6 py-4 font-bold">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
-              {sortedOrders.map(order => {
-                const dateObj = new Date(order.createdAt);
-                const formattedDate = dateObj.toLocaleDateString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric'
-                });
-                const formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead className="bg-bg-primary border-b border-border text-xs font-medium text-text-muted">
+                <tr>
+                  <th className="px-5 py-3.5 font-medium">Order ID</th>
+                  <th className="px-5 py-3.5 font-medium">Seating</th>
+                  <th className="px-5 py-3.5 font-medium">Date & Time</th>
+                  <th className="px-5 py-3.5 font-medium">Items</th>
+                  <th className="px-5 py-3.5 font-medium text-right">Total</th>
+                  <th className="px-5 py-3.5 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {sortedOrders.map(order => {
+                  const dateObj = new Date(order.createdAt);
+                  const formattedDate = dateObj.toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  });
+                  const formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-                return (
-                  <tr key={order.id} className="hover:bg-bg-primary/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-text-primary">
-                      <span className="font-mono text-xs">#{order.id}</span>
-                      {order.customerPhone && (
-                        <div className="mt-1 space-y-0.5">
-                          <div className="flex items-center gap-2 text-[11px] text-text-muted font-mono">
-                            <span>
-                              {revealedPhones[order.id] || maskPhone(order.customerPhone)}
-                            </span>
-                            <button
-                              type="button"
-                              disabled={revealingPhoneId === order.id}
-                              onClick={() => handleToggleFullPhone(order.id, order.customerPhone)}
-                              className="text-[10px] font-sans text-accent font-bold uppercase underline disabled:opacity-50"
-                            >
-                              {revealingPhoneId === order.id
-                                ? 'Verifying...'
-                                : revealedPhones[order.id]
-                                ? 'Hide'
-                                : 'View Full Number'}
-                            </button>
-                          </div>
-                          {phoneRevealError[order.id] && (
-                            <span className="block text-[10px] text-red-600 font-sans">
-                              {phoneRevealError[order.id]}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1 items-start">
-                        {order.tableId && order.tableId !== 'COUNTER' ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                            Table {order.tableId}
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
-                            Counter
-                          </span>
-                        )}
-                        {order.tableSessionId && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-accent px-1.5 py-0.5 rounded bg-accent/10 border border-accent/20">
-                            Session #{order.tableSessionId.split('_').pop()?.substring(0, 4).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-text-secondary whitespace-nowrap">
-                      <div className="flex items-center gap-1 text-text-primary font-medium">
-                        <Clock className="w-3.5 h-3.5 text-text-muted" />
-                        <span>{formattedTime}</span>
-                      </div>
-                      <span className="text-[11px] text-text-muted block mt-0.5">{formattedDate}</span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-text-secondary max-w-xs">
-                      <div className="line-clamp-2">
-                        {order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-semibold text-text-primary whitespace-nowrap">
-                      {formatCurrency(order.total)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {(() => {
-                        const isOrderSessionClosed = Boolean(
-                          order.tableSessionId && closedSessionIds.has(order.tableSessionId)
-                        );
-                        return (
-                          <div className="flex flex-col items-start gap-1">
-                            <select
-                              value={order.status}
-                              disabled={isOrderSessionClosed}
-                              title={isOrderSessionClosed ? 'Session closed — order is locked' : 'Update order status'}
-                              onChange={(e) => {
-                                if (isOrderSessionClosed) return;
-                                updateOrderStatus(order.id, e.target.value as OrderStatus).catch(console.error);
-                              }}
-                              className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-sm outline-none border ${
-                                isOrderSessionClosed ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
-                              } ${
-                                order.status === 'completed' ? 'border-green-200 bg-green-50 text-green-700' :
-                                order.status === 'cancelled' ? 'border-red-200 bg-red-50 text-red-700' :
-                                order.status === 'ready' ? 'border-blue-200 bg-blue-50 text-blue-700' :
-                                'border-orange-200 bg-orange-50 text-orange-700'
-                              }`}
-                            >
-                              {statuses.map(status => (
-                                <option key={status} value={status} className="bg-white text-text-primary">
-                                  {status}
-                                </option>
-                              ))}
-                            </select>
-                            {isOrderSessionClosed && (
-                              <span className="text-[10px] font-semibold text-neutral-500">
-                                Session Closed
+                  return (
+                    <tr key={order.id} className="hover:bg-bg-primary/60 transition-colors">
+                      <td className="px-5 py-3.5 align-top">
+                        <span className="font-mono text-xs font-medium text-text-primary">#{order.id}</span>
+                        {order.customerPhone && (
+                          <div className="mt-1 space-y-0.5">
+                            <div className="flex items-center gap-2 text-[11px] text-text-muted font-mono tabular-nums">
+                              <span>
+                                {revealedPhones[order.id] || maskPhone(order.customerPhone)}
+                              </span>
+                              <button
+                                type="button"
+                                disabled={revealingPhoneId === order.id}
+                                onClick={() => handleToggleFullPhone(order.id, order.customerPhone)}
+                                className="text-[11px] font-sans text-accent hover:text-text-primary underline disabled:opacity-50"
+                              >
+                                {revealingPhoneId === order.id
+                                  ? 'Verifying...'
+                                  : revealedPhones[order.id]
+                                  ? 'Hide'
+                                  : 'Reveal'}
+                              </button>
+                            </div>
+                            {phoneRevealError[order.id] && (
+                              <span className="block text-[11px] text-red-600 font-sans">
+                                {phoneRevealError[order.id]}
                               </span>
                             )}
                           </div>
-                        );
-                      })()}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 align-top whitespace-nowrap">
+                        <div className="text-xs font-medium text-text-primary">
+                          {order.tableId && order.tableId !== 'COUNTER' ? `Table ${order.tableId}` : 'Counter'}
+                        </div>
+                        {order.tableSessionId && (
+                          <div className="text-[11px] font-mono text-text-muted mt-0.5">
+                            Session #{order.tableSessionId.split('_').pop()?.substring(0, 4).toUpperCase()}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-5 py-3.5 align-top text-xs whitespace-nowrap font-mono tabular-nums">
+                        <div className="text-text-primary">{formattedTime}</div>
+                        <div className="text-[11px] text-text-muted mt-0.5">{formattedDate}</div>
+                      </td>
+                      <td className="px-5 py-3.5 align-top text-xs text-text-secondary max-w-xs">
+                        <div className="line-clamp-2 leading-relaxed">
+                          {order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                        </div>
+                      </td>
+                      <td className="px-5 py-3.5 align-top text-right text-xs font-mono tabular-nums font-medium text-text-primary whitespace-nowrap">
+                        {formatCurrency(order.total)}
+                      </td>
+                      <td className="px-5 py-3.5 align-top whitespace-nowrap">
+                        {(() => {
+                          const isOrderSessionClosed = Boolean(
+                            order.tableSessionId && closedSessionIds.has(order.tableSessionId)
+                          );
+                          return (
+                            <div className="flex flex-col items-start gap-1">
+                              <select
+                                value={order.status}
+                                disabled={isOrderSessionClosed}
+                                title={isOrderSessionClosed ? 'Session closed — order is locked' : 'Update order status'}
+                                onChange={(e) => {
+                                  if (isOrderSessionClosed) return;
+                                  updateOrderStatus(order.id, e.target.value as OrderStatus).catch(console.error);
+                                }}
+                                className={`text-xs font-medium capitalize px-2.5 py-1.5 rounded-sm outline-none border bg-white ${
+                                  isOrderSessionClosed ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+                                } ${
+                                  order.status === 'completed' ? 'border-emerald-200 text-emerald-700' :
+                                  order.status === 'cancelled' ? 'border-red-200 text-red-700' :
+                                  order.status === 'ready' ? 'border-blue-200 text-blue-700' :
+                                  'border-amber-200 text-amber-800'
+                                }`}
+                              >
+                                {statuses.map(status => (
+                                  <option key={status} value={status} className="bg-white text-text-primary">
+                                    {status}
+                                  </option>
+                                ))}
+                              </select>
+                              {isOrderSessionClosed && (
+                                <span className="text-[11px] text-text-muted">
+                                  Session Closed
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

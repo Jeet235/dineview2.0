@@ -1,6 +1,6 @@
 import React, { memo, useState } from 'react';
-import { DietaryTag, MenuItem, getMenuItemName, getMenuItemDescription } from '../data/menu';
-import { Flame, Footprints, Plus, Minus, Box } from 'lucide-react';
+import { MenuItem, getMenuItemName, getMenuItemDescription } from '../data/menu';
+import { Plus, Minus, UtensilsCrossed } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../utils/currency';
 import { ModelViewerModal } from './ModelViewerModal';
@@ -27,9 +27,9 @@ export const MenuItemCard: React.FC<Props> = memo(({
 }) => {
   const walkTime = Math.round(item.calories / 5);
   const navigate = useNavigate();
-  
-  const actualModelUrl = item.modelUrl || item.modelUrlAr;
+  const [imgError, setImgError] = useState(false);
 
+  const actualModelUrl = item.modelUrl || item.modelUrlAr;
   const displayName = getMenuItemName(item, lang);
   const displayDescription = getMenuItemDescription(item, lang);
 
@@ -39,128 +39,121 @@ export const MenuItemCard: React.FC<Props> = memo(({
   };
 
   return (
-    <div className="flex flex-col group relative transition-opacity duration-300 hover:opacity-95">
-      <div 
-        className="relative w-full aspect-square md:aspect-[4/3] bg-border rounded-sm overflow-hidden mb-6 cursor-pointer"
+    <article className="flex flex-col group relative transition-transform duration-200 hover:-translate-y-0.5">
+      <div
+        className="relative w-full aspect-[4/3] bg-bg-secondary rounded-sm overflow-hidden mb-5 cursor-pointer border border-border/70"
         onClick={handleItemClick}
       >
-        <img
-          src={item.image}
-          alt={displayName}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          loading="lazy"
-          referrerPolicy="no-referrer"
-        />
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-
-        {/* Veg / Spicy badge overlay */}
-        {item.tags && item.tags.length > 0 && (
-          <div className="absolute top-2.5 start-2.5 z-10 flex flex-wrap gap-1">
-            {item.tags.some(tag => tag.id === 'v' || tag.id === 'vg') && (
-              <span className="bg-emerald-950/80 backdrop-blur-xs text-emerald-300 border border-emerald-500/40 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-xs flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                Veg
-              </span>
-            )}
-            {item.tags.some(tag => tag.id === 'spicy') && (
-              <span className="bg-red-950/80 backdrop-blur-xs text-red-300 border border-red-500/40 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-xs flex items-center gap-1">
-                <Flame className="w-2.5 h-2.5 fill-red-400" />
-                Spicy
-              </span>
-            )}
+        {!imgError && item.image ? (
+          <img
+            src={item.image}
+            alt={displayName}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-text-muted bg-bg-secondary p-4 text-center">
+            <UtensilsCrossed className="w-6 h-6" aria-hidden="true" />
+            <span className="text-xs font-medium">{displayName}</span>
           </div>
         )}
       </div>
-      
-      <div className="flex justify-between items-start gap-4">
-        <h3 
-          className="text-xl md:text-2xl font-serif text-text-primary leading-tight cursor-pointer hover:text-accent transition-colors"
+
+      <div className="flex justify-between items-baseline gap-4">
+        <h3
+          className="text-lg sm:text-xl font-serif font-medium text-text-primary leading-snug cursor-pointer hover:text-accent transition-colors"
           onClick={handleItemClick}
         >
           {displayName}
         </h3>
-        <span className="text-lg md:text-xl font-serif text-text-primary/90 shrink-0">{formatCurrency(item.price)}</span>
+        <span className="text-base font-mono font-medium tabular-nums text-text-primary shrink-0">
+          {formatCurrency(item.price)}
+        </span>
       </div>
 
-      {/* Dietary Tags Chips */}
+      {/* Unboxed dietary metadata separated by typographic dots */}
       {item.tags && item.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          {item.tags.map((tag) => (
-            <span
-              key={tag.id}
-              className={`inline-flex items-center px-2 py-0.5 rounded-xs text-[10px] font-bold uppercase tracking-wider border ${tag.color || 'bg-neutral-100 text-neutral-700 border-neutral-200'}`}
-            >
-              {t[`tag_${tag.id}`] || tag.label}
-            </span>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1.5 text-xs text-text-muted">
+          {item.tags.map((tag, idx) => (
+            <React.Fragment key={tag.id}>
+              {idx > 0 && <span aria-hidden="true">·</span>}
+              <span className={tag.id === 'spicy' ? 'text-red-700 font-medium' : tag.id === 'v' || tag.id === 'vg' ? 'text-emerald-800 font-medium' : ''}>
+                {t[`tag_${tag.id}`] || tag.label}
+              </span>
+            </React.Fragment>
           ))}
         </div>
       )}
-      
-      <p className="text-sm md:text-base text-text-secondary mt-2.5 leading-relaxed line-clamp-2">
+
+      <p className="text-sm text-text-secondary mt-2.5 leading-relaxed line-clamp-2 flex-1">
         {displayDescription}
       </p>
-      
-      <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-border/50 text-xs font-medium text-text-muted">
-        <div className="flex items-center gap-1.5">
-          <Flame className="w-3.5 h-3.5" />
+
+      <div className="flex items-center justify-between gap-3 mt-5 pt-3.5 border-t border-border/70">
+        <div className="flex items-center gap-2 text-xs text-text-muted tabular-nums">
           <span>{item.calories} {t.kcal || 'kcal'}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Footprints className="w-3.5 h-3.5" />
+          <span aria-hidden="true">·</span>
           <span>{walkTime} {t.walk_min || 'min walk'}</span>
         </div>
 
-        <div className="ms-auto flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
           {actualModelUrl && (
-            <ModelViewerModal 
-              modelUrl={actualModelUrl} 
+            <ModelViewerModal
+              modelUrl={actualModelUrl}
               modelUrlAr={item.modelUrlAr || actualModelUrl}
               iosSrc={item.iosSrc}
               poster={item.image}
-              itemName={displayName} 
+              itemName={displayName}
             />
           )}
 
           {cartQuantity > 0 && cartItemId ? (
-            <div className="flex items-center bg-bg-secondary border border-border rounded-full h-8 overflow-hidden">
-              <button 
+            <div className="flex items-center bg-white border border-border rounded-sm h-9 overflow-hidden">
+              <button
+                type="button"
                 onClick={() => updateQuantity(cartItemId, cartQuantity - 1)}
-                className="w-8 h-full flex items-center justify-center text-text-primary hover:bg-border/50 active:bg-border transition-colors"
+                className="w-8 h-full flex items-center justify-center text-text-primary hover:bg-bg-secondary transition-colors cursor-pointer"
+                aria-label="Decrease quantity"
               >
-                <Minus className="w-3 h-3" />
+                <Minus className="w-3.5 h-3.5" />
               </button>
-              <span className="w-6 text-center text-[10px] font-bold text-text-primary">
+              <span className="w-7 text-center text-xs font-mono font-medium tabular-nums text-text-primary">
                 {cartQuantity}
               </span>
-              <button 
+              <button
+                type="button"
                 onClick={() => updateQuantity(cartItemId, cartQuantity + 1)}
                 disabled={cartQuantity >= (item.maxPerOrder ?? 20)}
                 className={`w-8 h-full flex items-center justify-center transition-colors ${
-                  cartQuantity >= (item.maxPerOrder ?? 20) 
-                    ? 'text-text-muted cursor-not-allowed opacity-50' 
-                    : 'text-text-primary hover:bg-border/50 active:bg-border'
+                  cartQuantity >= (item.maxPerOrder ?? 20)
+                    ? 'text-text-muted cursor-not-allowed opacity-50'
+                    : 'text-text-primary hover:bg-bg-secondary cursor-pointer'
                 }`}
+                aria-label="Increase quantity"
               >
-                <Plus className="w-3 h-3" />
+                <Plus className="w-3.5 h-3.5" />
               </button>
             </div>
           ) : (
-            <button 
+            <button
+              type="button"
               onClick={() => addItem(item)}
               disabled={item.maxPerOrder === 0}
-              className={`flex items-center gap-1 h-8 px-4 rounded-full uppercase tracking-widest font-bold text-[9px] transition-all ${
+              className={`inline-flex items-center gap-1.5 h-9 px-4 rounded-sm text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
                 item.maxPerOrder === 0
                   ? 'bg-text-muted text-white cursor-not-allowed opacity-50'
-                  : 'bg-text-primary text-white hover:bg-text-secondary hover:scale-105 active:scale-95'
+                  : 'bg-text-primary text-white hover:bg-[#2E2E2C] cursor-pointer'
               }`}
             >
-              <Plus className="w-3 h-3" />
-              {t.add || 'Add'}
+              <Plus className="w-3.5 h-3.5" />
+              <span>{t.add || 'Add'}</span>
             </button>
           )}
         </div>
       </div>
-    </div>
+    </article>
   );
 }, (prevProps, nextProps) => {
   const p = prevProps.item;

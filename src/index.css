@@ -1,24 +1,48 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  
-  --color-bg-primary: #FAF9F6;
-  --color-text-primary: #1C1C1C;
-  --color-text-secondary: #706F6C;
-  --color-text-muted: #A19F9A;
-  --color-accent: #8B7355;
-  --color-border: #E5E3DF;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --color-bg-primary: #FBFBFA;
+  --color-bg-secondary: #F4F4F1;
+  --color-text-primary: #161615;
+  --color-text-secondary: #575652;
+  --color-text-muted: #76756F;
+  --color-accent: #7A5C38;
+  --color-border: #E4E4DF;
 }
 
 @layer base {
   body {
-    @apply font-sans bg-bg-primary text-text-primary;
+    @apply font-sans bg-bg-primary text-text-primary antialiased;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
+  }
+
+  h1, h2 {
+    text-wrap: balance;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 
   [dir="rtl"], .rtl-layout {

@@ -8,7 +8,6 @@ import { Footer } from '../../components/Footer';
 import { FoodAssistantModal } from '../../components/FoodAssistantModal';
 import { CartButton } from '../../components/CartButton';
 import { PhoneGateModal } from '../../components/PhoneGateModal';
-import { Sparkles, Receipt } from 'lucide-react';
 import { clearMenuScrollPosition } from '../../utils/scrollRestoration';
 import { subscribeActiveSessionForTable, TableSession } from '../../services/sessionService';
 
@@ -105,78 +104,92 @@ export default function CustomerLayout() {
     }
     const element = document.getElementById(sectionId);
     if (element) {
-      const yOffset = -80; // Account for top nav
+      const yOffset = -68;
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
 
+  const sessionOrderCount = Array.isArray(activeTableSession?.orderIds)
+    ? activeTableSession.orderIds.length
+    : 0;
+
   return (
     <div className={`min-h-screen bg-bg-primary font-sans text-text-primary flex flex-col ${isRTL ? 'rtl' : 'ltr'}`}>
-      {/* Top Navigation */}
-      <nav className="h-20 px-6 md:px-12 flex justify-between items-center border-b border-border shrink-0 bg-bg-primary sticky top-0 z-50">
-        <div className="flex items-center gap-8 lg:gap-12">
-          <span 
-            className="text-2xl font-serif tracking-tight font-bold cursor-pointer" 
+      {/* Top Bar: 3-zone contract, single-line controls */}
+      <header className="h-16 border-b border-border shrink-0 bg-bg-primary/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto h-full px-4 sm:px-8 flex items-center justify-between gap-4 sm:gap-8">
+          {/* Zone 1: Single-line Brand Wordmark */}
+          <button
+            type="button"
             onClick={(e) => handleNavClick('top', e)}
+            className="text-xl sm:text-2xl font-serif tracking-tight font-semibold text-text-primary whitespace-nowrap shrink-0 hover:opacity-80 transition-opacity cursor-pointer"
           >
             DineView
-          </span>
-          <div className="hidden lg:flex gap-8 text-[10px] font-bold uppercase tracking-widest text-text-secondary">
-            <a href="#menu" onClick={(e) => handleNavClick('menu', e)} className="hover:text-text-primary transition-colors">{t.nav_menu}</a>
-            <a href="#locations" onClick={(e) => handleNavClick('locations', e)} className="hover:text-text-primary transition-colors">{t.nav_locations}</a>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 md:gap-5">
-          <LanguageSelector />
+          </button>
 
-          {/* Table / Counter badge */}
-          <div 
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-border bg-border/20 text-[10px] font-bold uppercase tracking-wider text-text-primary select-none"
-            title={activeTableId && activeTableId !== 'COUNTER' ? `Assigned to Table ${activeTableId}` : 'Ordering at Counter'}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full ${activeTableId && activeTableId !== 'COUNTER' ? 'bg-accent' : 'bg-neutral-400'}`}></span>
-            <span>{activeTableId && activeTableId !== 'COUNTER' ? `Table ${activeTableId}` : 'Counter'}</span>
-          </div>
-
-          {/* Shared Table Orders & Combined Bill button (visible when table has an active session) */}
-          {activeTableSession && activeTableId && activeTableId !== 'COUNTER' && (
-            <button
-              type="button"
-              onClick={() => navigate('/table-orders')}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-accent/40 bg-accent/10 hover:bg-accent/20 text-[10px] font-bold uppercase tracking-wider text-text-primary transition-colors cursor-pointer"
-              title={`View shared orders & combined bill for Table ${activeTableId}`}
+          {/* Zone 2: Clean single-line text navigation */}
+          <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-text-secondary">
+            <a
+              href="#menu"
+              onClick={(e) => handleNavClick('menu', e)}
+              className="hover:text-text-primary hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
-              <Receipt className="w-3.5 h-3.5 text-accent" />
-              <span className="hidden sm:inline">Table Bill</span>
-              <span className="sm:hidden">Bill</span>
-              {Array.isArray(activeTableSession.orderIds) && activeTableSession.orderIds.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-accent text-white text-[9px] font-bold">
-                  {activeTableSession.orderIds.length}
-                </span>
-              )}
-            </button>
-          )}
-          
-          <CartButton variant="header" t={t} />
+              {t.nav_menu}
+            </a>
+            <a
+              href="#locations"
+              onClick={(e) => handleNavClick('locations', e)}
+              className="hover:text-text-primary hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+            >
+              {t.nav_locations}
+            </a>
+            {activeTableSession && activeTableId && activeTableId !== 'COUNTER' && (
+              <button
+                type="button"
+                onClick={() => navigate('/table-orders')}
+                className="hover:text-text-primary hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0 text-accent font-medium cursor-pointer tabular-nums"
+                title={`View shared orders and combined bill for Table ${activeTableId}`}
+              >
+                Table Bill{sessionOrderCount > 0 ? ` (${sessionOrderCount})` : ''}
+              </button>
+            )}
+          </nav>
+
+          {/* Zone 3: Table context + Language + Cart */}
+          <div className="flex items-center gap-3 sm:gap-5 shrink-0">
+            <span
+              className="hidden sm:inline text-xs font-medium text-text-secondary whitespace-nowrap shrink-0 tabular-nums"
+              title={activeTableId && activeTableId !== 'COUNTER' ? `Assigned to Table ${activeTableId}` : 'Ordering at Counter'}
+            >
+              {activeTableId && activeTableId !== 'COUNTER' ? `Table ${activeTableId}` : 'Counter'}
+            </span>
+
+            {activeTableSession && activeTableId && activeTableId !== 'COUNTER' && (
+              <button
+                type="button"
+                onClick={() => navigate('/table-orders')}
+                className="md:hidden text-xs font-medium text-accent hover:underline underline-offset-4 whitespace-nowrap shrink-0 tabular-nums"
+                title={`View shared orders and combined bill for Table ${activeTableId}`}
+              >
+                Bill{sessionOrderCount > 0 ? ` (${sessionOrderCount})` : ''}
+              </button>
+            )}
+
+            <LanguageSelector />
+            <CartButton variant="header" t={t} />
+          </div>
         </div>
-      </nav>
+      </header>
 
       {/* Main Content Area - Guard MenuPage behind phone gate */}
       <div className="flex-1">
         {shouldShowGate ? (
-          <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 text-center animate-in fade-in">
-            <div className="w-12 h-12 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent mb-4 animate-pulse">
-              <Sparkles className="w-6 h-6" />
-            </div>
-            <h2 className="font-serif text-2xl md:text-3xl text-text-primary mb-2">Welcome to DineView</h2>
-            <p className="max-w-md text-sm text-text-secondary leading-relaxed mb-6">
-              Please enter your mobile phone number in the gate prompt to unlock our chef's live digital menu and AI Concierge.
+          <div className="min-h-[70vh] flex flex-col items-center justify-center p-8 text-center">
+            <h2 className="font-serif text-2xl md:text-3xl text-text-primary mb-3">Welcome to DineView</h2>
+            <p className="max-w-md text-sm text-text-secondary leading-relaxed">
+              Enter your mobile number to view our seasonal menu and place orders from your table.
             </p>
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-xs font-semibold text-accent">
-              <span className="w-2 h-2 rounded-full bg-accent animate-ping" />
-              <span>Awaiting phone verification...</span>
-            </div>
           </div>
         ) : (
           <Outlet context={{ lang, t, isRTL, tKey }} />
@@ -186,8 +199,8 @@ export default function CustomerLayout() {
       {/* Footer */}
       <Footer t={t} isRTL={isRTL} onNavigate={handleNavClick} />
 
-      {/* AI Food Recommendation Assistant */}
-      <FoodAssistantModal />
+      {/* AI Food Recommendation Assistant — displayed only on the initial customer menu page */}
+      {(pathname === '/' || pathname === '/menu') && <FoodAssistantModal />}
 
       {/* Mandatory Phone Gate Modal - Only for guarded customer routes; preserves URL and ?table */}
       {shouldShowGate && (

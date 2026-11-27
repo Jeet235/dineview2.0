@@ -9,19 +9,20 @@ interface CategoryNavProps {
 
 export function CategoryNav({ categories, activeCategory, onSelectCategory, translations }: CategoryNavProps) {
   return (
-    <div className="sticky top-20 z-40 bg-bg-primary/95 backdrop-blur-md border-b border-border">
-      <div className="max-w-4xl mx-auto px-6 md:px-12">
-        <ul className="flex overflow-x-auto hide-scrollbar py-6 gap-8 items-center">
+    <div className="sticky top-16 z-40 bg-bg-primary/95 backdrop-blur-sm border-b border-border">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8">
+        <ul className="flex overflow-x-auto hide-scrollbar py-3.5 gap-6 sm:gap-8 items-center">
           {categories.map((category) => {
             const isActive = category.id === activeCategory;
             return (
               <li key={category.id} className="shrink-0">
                 <button
+                  type="button"
                   onClick={() => onSelectCategory(category.id)}
-                  className={`text-lg font-serif transition-colors whitespace-nowrap ${
+                  className={`text-sm sm:text-base font-medium transition-colors whitespace-nowrap shrink-0 pb-1 cursor-pointer ${
                     isActive
-                      ? 'text-accent border-b-2 border-accent pb-1'
-                      : 'text-text-secondary hover:text-text-primary pb-1'
+                      ? 'text-text-primary border-b-2 border-accent'
+                      : 'text-text-secondary hover:text-text-primary border-b-2 border-transparent'
                   }`}
                   aria-current={isActive ? 'page' : undefined}
                 >

@@ -3,13 +3,19 @@ import { Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { LogOut, LayoutDashboard, UtensilsCrossed, ClipboardList, QrCode, Users } from 'lucide-react';
 
+const NAV_ITEMS = [
+  { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/admin/orders', label: 'Orders', icon: ClipboardList },
+  { path: '/admin/sessions', label: 'Sessions', icon: Users },
+  { path: '/admin/tables', label: 'Tables & QRs', icon: QrCode },
+  { path: '/admin/menu', label: 'Menu', icon: UtensilsCrossed },
+];
+
 export default function AdminLayout() {
   const { isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If not admin, and we are not on the login page (handled by routes), we'd redirect.
-  // Actually, we should protect the nested routes, but let's do it simply here.
   const isLoginPage = location.pathname === '/admin/login';
 
   if (!isAdmin && !isLoginPage) {
@@ -21,72 +27,54 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-border flex flex-col fixed inset-y-0 z-10">
-        <div className="h-20 flex items-center px-8 border-b border-border">
-          <span className="text-xl font-serif tracking-tight font-bold">DineView Admin</span>
+    <div className="min-h-screen bg-bg-primary flex">
+      {/* Flat Fixed Sidebar */}
+      <aside className="w-60 bg-white border-r border-border flex flex-col fixed inset-y-0 z-10">
+        <div className="h-16 flex items-center px-6 border-b border-border">
+          <div className="flex items-baseline gap-2">
+            <span className="text-lg font-serif tracking-tight font-semibold text-text-primary">
+              DineView
+            </span>
+            <span className="text-xs text-text-muted">Admin</span>
+          </div>
         </div>
-        <nav className="flex-1 py-8 px-4 flex flex-col gap-2">
-          <button 
-            onClick={() => navigate('/admin')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
-              location.pathname === '/admin' ? 'bg-text-primary text-white' : 'text-text-secondary hover:bg-border/30 hover:text-text-primary'
-            }`}
-          >
-            <LayoutDashboard className="w-4 h-4" />
-            Dashboard
-          </button>
-          <button 
-            onClick={() => navigate('/admin/orders')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
-              location.pathname === '/admin/orders' ? 'bg-text-primary text-white' : 'text-text-secondary hover:bg-border/30 hover:text-text-primary'
-            }`}
-          >
-            <ClipboardList className="w-4 h-4" />
-            Orders
-          </button>
-          <button 
-            onClick={() => navigate('/admin/sessions')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
-              location.pathname === '/admin/sessions' ? 'bg-text-primary text-white' : 'text-text-secondary hover:bg-border/30 hover:text-text-primary'
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            Sessions
-          </button>
-          <button 
-            onClick={() => navigate('/admin/tables')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
-              location.pathname === '/admin/tables' ? 'bg-text-primary text-white' : 'text-text-secondary hover:bg-border/30 hover:text-text-primary'
-            }`}
-          >
-            <QrCode className="w-4 h-4" />
-            Tables & QRs
-          </button>
-          <button 
-            onClick={() => navigate('/admin/menu')}
-            className={`flex items-center gap-3 px-4 py-3 rounded-sm text-sm font-medium transition-colors ${
-              location.pathname === '/admin/menu' ? 'bg-text-primary text-white' : 'text-text-secondary hover:bg-border/30 hover:text-text-primary'
-            }`}
-          >
-            <UtensilsCrossed className="w-4 h-4" />
-            Menu
-          </button>
+
+        <nav className="flex-1 py-5 px-3 flex flex-col gap-1" aria-label="Admin navigation">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            return (
+              <button
+                key={item.path}
+                type="button"
+                onClick={() => navigate(item.path)}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-sm text-sm font-medium transition-colors whitespace-nowrap ${
+                  isActive
+                    ? 'bg-text-primary text-bg-primary'
+                    : 'text-text-secondary hover:bg-bg-secondary hover:text-text-primary'
+                }`}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
-        <div className="p-4 border-t border-border">
-          <button 
+
+        <div className="p-3 border-t border-border">
+          <button
+            type="button"
             onClick={logout}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-sm text-sm font-medium text-text-muted hover:bg-border/30 hover:text-red-600 transition-colors"
+            className="flex items-center gap-3 w-full px-3.5 py-2.5 rounded-sm text-sm font-medium text-text-muted hover:bg-bg-secondary hover:text-red-600 transition-colors whitespace-nowrap"
           >
-            <LogOut className="w-4 h-4" />
-            Logout
+            <LogOut className="w-4 h-4 shrink-0" />
+            <span>Logout</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 ml-60 p-6 lg:p-8 max-w-[1440px]">
         <Outlet />
       </main>
     </div>

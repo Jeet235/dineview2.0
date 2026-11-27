@@ -210,26 +210,28 @@ function buildStaffCookie(req: express.Request, value: string, maxAgeSeconds: nu
   return attrs.join("; ");
 }
 
-function verifyStaffPasscode(role: "manager" | "admin", passcode: string): boolean {
+function getConfiguredStaffPasscode(role: "manager" | "admin"): string | null {
+  const raw =
+    role === "manager"
+      ? process.env.MANAGER_PASSCODE
+      : process.env.ADMIN_PASSCODE;
+  const trimmed = typeof raw === "string" ? raw.trim() : "";
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function verifyStaffPasscode(
+  role: "manager" | "admin",
+  passcode: string
+): { ok: boolean; configured: boolean } {
+  const envPasscode = getConfiguredStaffPasscode(role);
+  if (!envPasscode) {
+    return { ok: false, configured: false };
+  }
   const trimmed = passcode.trim();
-  if (!trimmed) return false;
-
-  if (role === "manager") {
-    const envPasscode = process.env.MANAGER_PASSCODE?.trim();
-    if (envPasscode) {
-      return constantTimeCompare(trimmed, envPasscode);
-    }
-    // Preserve existing DineView preview manager passcodes when env var is not configured
-    const previewPasscodes = ["dineview2025", "admin123", "1234"];
-    return previewPasscodes.some((candidate) => constantTimeCompare(trimmed, candidate));
+  if (!trimmed) {
+    return { ok: false, configured: true };
   }
-
-  const envAdminPasscode = process.env.ADMIN_PASSCODE?.trim();
-  if (envAdminPasscode) {
-    return constantTimeCompare(trimmed, envAdminPasscode);
-  }
-  // Preserve existing DineView preview admin passcode when env var is not configured
-  return constantTimeCompare(trimmed, "admin");
+  return { ok: constantTimeCompare(trimmed, envPasscode), configured: true };
 }
 
 export function getLocalIpAddress(): string {
@@ -514,11 +516,20 @@ async function startServer() {
       return res.status(400).json({ error: "Passcode is required." });
     }
 
-    if (!verifyStaffPasscode(role, passcode)) {
+    const verification = verifyStaffPasscode(role, passcode);
+    if (!verification.configured) {
+      return res.status(503).json({
+        error:
+          role === "manager"
+            ? "Manager authentication is not configured. Please contact the administrator."
+            : "Admin authentication is not configured. Please contact the administrator.",
+      });
+    }
+    if (!verification.ok) {
       return res.status(401).json({
         error:
           role === "manager"
-            ? 'Invalid manager passcode. Default demo passcode is "dineview2025".'
+            ? "Invalid manager passcode."
             : "Incorrect password.",
       });
     }
@@ -659,11 +670,60 @@ async function startServer() {
   });
 
   // Network info endpoint for mobile QR code generation (supports both public online URL and local Wi-Fi IP)
-  app.get("/api/network-info", (_req, res) => {
+  app.get("/api/network-info", (req, res) => {
     const ip = getLocalIpAddress();
-    const envUrl = process.env.VITE_APP_URL || process.env.APP_URL;
-    const isPublicOnline = envUrl && envUrl.startsWith("http") && !envUrl.includes("localhost") && !envUrl.includes("MY_APP_URL");
-    const publicUrl = isPublicOnline ? envUrl.replace(/\/$/, "") : null;
+    const isNonCanonicalHost = (hostname: string): boolean => {
+      const host = hostname.replace(/^\[|\]$/g, "").toLowerCase();
+      return (
+        !host ||
+        host === "localhost" ||
+        host.endsWith(".localhost") ||
+        host.endsWith(".local") ||
+        host === "127.0.0.1" ||
+        host === "0.0.0.0" ||
+        host === "::1" ||
+        /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host) ||
+        /^192\.168\.\d{1,3}\.\d{1,3}$/.test(host) ||
+        /^169\.254\.\d{1,3}\.\d{1,3}$/.test(host) ||
+        /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(host) ||
+        /^(ais-dev-|ais-pre-).+\.run\.app$/i.test(host)
+      );
+    };
+
+    const parseCanonicalUrl = (raw?: string): string | null => {
+      if (!raw || typeof raw !== "string") return null;
+      const trimmed = raw.trim().replace(/\/+$/, "");
+      if (!trimmed || trimmed.includes("MY_APP_URL")) return null;
+      try {
+        const parsed = new URL(trimmed);
+        if (
+          (parsed.protocol === "https:" || parsed.protocol === "http:") &&
+          !isNonCanonicalHost(parsed.hostname)
+        ) {
+          return parsed.origin.replace(/\/+$/, "");
+        }
+      } catch {}
+      return null;
+    };
+
+    const rawHost = String(req.headers["x-forwarded-host"] || req.headers.host || "")
+      .split(",")[0]
+      .trim();
+    const rawProto = String(req.headers["x-forwarded-proto"] || req.protocol || "https")
+      .split(",")[0]
+      .trim();
+
+    let requestPublicUrl: string | null = null;
+    if (rawHost && /^[a-z0-9.-]+(:\d+)?$/i.test(rawHost)) {
+      const scheme = rawProto === "http" ? "http" : "https";
+      requestPublicUrl = parseCanonicalUrl(`${scheme}://${rawHost}`);
+    }
+
+    const envPublicUrl =
+      parseCanonicalUrl(process.env.VITE_APP_URL) ||
+      parseCanonicalUrl(process.env.APP_URL);
+    const publicUrl =
+      requestPublicUrl || envPublicUrl || "https://dineview-1.ai.studio";
     const localUrl = `http://${ip}:${PORT}`;
     const url = publicUrl || localUrl;
     res.json({

@@ -37,42 +37,40 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
         className="mt-auto border-t border-border bg-bg-primary text-text-primary"
         aria-label="Footer"
       >
-        <div className="max-w-4xl mx-auto px-6 md:px-12 py-12 md:py-16">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 md:py-16">
           {/* Top Brand & Tagline Area */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b border-border/60">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-10 border-b border-border">
             <div className="text-start">
               <button
                 type="button"
                 onClick={(e) => onNavigate('top', e)}
-                className="text-2xl md:text-3xl font-serif tracking-tight font-bold text-text-primary hover:opacity-80 transition-opacity text-start focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm"
+                className="text-2xl font-serif tracking-tight font-semibold text-text-primary hover:opacity-80 transition-opacity text-start rounded-sm"
               >
                 DineView
               </button>
-              <p className="text-text-secondary text-xs md:text-sm font-sans tracking-wide mt-2 max-w-sm">
+              <p className="text-text-secondary text-sm mt-2 max-w-sm leading-relaxed">
                 {t.footer_tagline || 'A modern dining experience, thoughtfully served.'}
               </p>
             </div>
 
-            {/* Dietary Information Note */}
-            <div className="flex items-center gap-2.5 text-[10px] uppercase tracking-[0.2em] font-medium text-text-muted py-1.5 px-3 rounded-full border border-border/60 bg-border/20 self-start md:self-end">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400 shrink-0" aria-hidden="true" />
-              <span>{t.vegan_gf || 'Vegan & Gluten-Free Options Available'}</span>
-            </div>
+            <p className="text-xs text-text-muted self-start md:self-end">
+              {t.vegan_gf || 'Vegan & Gluten-Free Options Available'}
+            </p>
           </div>
 
           {/* Navigation Columns */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-10">
             {/* Column 1: Explore */}
             <div className="text-start flex flex-col gap-3">
-              <h3 className="text-[10px] uppercase tracking-[0.25em] font-bold text-text-muted">
+              <h3 className="text-xs font-medium text-text-muted">
                 {t.footer_explore || 'Explore'}
               </h3>
-              <ul className="flex flex-col gap-2.5 text-xs text-text-secondary">
+              <ul className="flex flex-col gap-2.5 text-sm text-text-secondary">
                 <li>
                   <button
                     type="button"
                     onClick={(e) => onNavigate('top', e)}
-                    className="hover:text-text-primary transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm text-start"
+                    className="hover:text-text-primary transition-colors rounded-sm text-start"
                   >
                     {t.footer_home || 'Home'}
                   </button>
@@ -81,7 +79,7 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
                   <button
                     type="button"
                     onClick={(e) => onNavigate('menu', e)}
-                    className="hover:text-text-primary transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm text-start"
+                    className="hover:text-text-primary transition-colors rounded-sm text-start"
                   >
                     {t.nav_menu || 'Menu'}
                   </button>
@@ -90,7 +88,7 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
                   <button
                     type="button"
                     onClick={(e) => onNavigate('locations', e)}
-                    className="hover:text-text-primary transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm text-start"
+                    className="hover:text-text-primary transition-colors rounded-sm text-start"
                   >
                     {t.nav_locations || 'Locations'}
                   </button>
@@ -100,15 +98,15 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
 
             {/* Column 2: Information */}
             <div className="text-start flex flex-col gap-3">
-              <h3 className="text-[10px] uppercase tracking-[0.25em] font-bold text-text-muted">
+              <h3 className="text-xs font-medium text-text-muted">
                 {t.footer_information || 'Information'}
               </h3>
-              <ul className="flex flex-col gap-2.5 text-xs text-text-secondary">
+              <ul className="flex flex-col gap-2.5 text-sm text-text-secondary">
                 <li>
                   <button
                     type="button"
                     onClick={() => setActiveModal('about')}
-                    className="hover:text-text-primary transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm text-start"
+                    className="hover:text-text-primary transition-colors rounded-sm text-start"
                   >
                     {t.footer_about || 'About'}
                   </button>
@@ -117,7 +115,7 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
                   <button
                     type="button"
                     onClick={() => setActiveModal('contact')}
-                    className="hover:text-text-primary transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm text-start"
+                    className="hover:text-text-primary transition-colors rounded-sm text-start"
                   >
                     {t.footer_contact || 'Contact'}
                   </button>
@@ -126,7 +124,7 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
                   <button
                     type="button"
                     onClick={() => setActiveModal('privacy')}
-                    className="hover:text-text-primary transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm text-start"
+                    className="hover:text-text-primary transition-colors rounded-sm text-start"
                   >
                     {t.footer_privacy || 'Privacy Policy'}
                   </button>
@@ -136,20 +134,20 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
 
             {/* Column 3: Follow */}
             <div className="text-start flex flex-col gap-3">
-              <h3 className="text-[10px] uppercase tracking-[0.25em] font-bold text-text-muted">
+              <h3 className="text-xs font-medium text-text-muted">
                 {t.footer_follow || 'Follow'}
               </h3>
-              <ul className="flex flex-col gap-2.5 text-xs text-text-secondary">
+              <ul className="flex flex-col gap-2.5 text-sm text-text-secondary">
                 <li>
                   <a
                     href="https://instagram.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-text-primary transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm"
+                    className="inline-flex items-center gap-1 hover:text-text-primary transition-colors rounded-sm"
                     aria-label="Instagram (opens in new tab)"
                   >
                     <span>Instagram</span>
-                    <ArrowUpRight className="w-3 h-3 opacity-60" aria-hidden="true" />
+                    <ArrowUpRight className="w-3.5 h-3.5 opacity-60" aria-hidden="true" />
                   </a>
                 </li>
                 <li>
@@ -157,11 +155,11 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
                     href="https://twitter.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 hover:text-text-primary transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary rounded-sm"
+                    className="inline-flex items-center gap-1 hover:text-text-primary transition-colors rounded-sm"
                     aria-label="Twitter (opens in new tab)"
                   >
                     <span>Twitter</span>
-                    <ArrowUpRight className="w-3 h-3 opacity-60" aria-hidden="true" />
+                    <ArrowUpRight className="w-3.5 h-3.5 opacity-60" aria-hidden="true" />
                   </a>
                 </li>
               </ul>
@@ -169,7 +167,7 @@ export const Footer: React.FC<FooterProps> = ({ t, isRTL, onNavigate }) => {
           </div>
 
           {/* Bottom Copyright & Tax Notice */}
-          <div className="pt-8 border-t border-border/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-[11px] text-text-secondary/70 font-sans tracking-normal">
+          <div className="pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 text-xs text-text-muted">
             <p>&copy; {new Date().getFullYear()} {t.footer_rights || 'DineView Restaurant. All rights reserved.'}</p>
             <p>{t.all_prices || 'All prices are in INR and exclusive of taxes.'}</p>
           </div>

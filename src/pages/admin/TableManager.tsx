@@ -3,6 +3,55 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useTable, RestaurantTable, formatDemoTableName } from '../../context/TableContext';
 import { Plus, Trash2, Printer, ExternalLink, QrCode, Copy, Check, Sparkles, RefreshCw, Wifi, Globe } from 'lucide-react';
 
+const DEFAULT_CANONICAL_PUBLIC_URL = 'https://dineview-1.ai.studio';
+
+function isLocalOrPrivateHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  if (
+    !host ||
+    host === 'localhost' ||
+    host.endsWith('.localhost') ||
+    host.endsWith('.local') ||
+    host === '127.0.0.1' ||
+    host === '0.0.0.0' ||
+    host === '::1'
+  ) {
+    return true;
+  }
+  if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host)) return true;
+  if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(host)) return true;
+  if (/^169\.254\.\d{1,3}\.\d{1,3}$/.test(host)) return true;
+  if (/^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(host)) return true;
+  return false;
+}
+
+function isAiStudioPreviewHost(hostname: string): boolean {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  return /^(ais-dev-|ais-pre-).+\.run\.app$/i.test(host);
+}
+
+function normalizeCanonicalPublicUrl(urlStr?: string | null): string | null {
+  if (!urlStr || typeof urlStr !== 'string') return null;
+  const trimmed = urlStr.trim().replace(/\/+$/, '');
+  if (!trimmed || trimmed.includes('MY_APP_URL')) return null;
+  try {
+    const parsed = new URL(trimmed);
+    if (
+      (parsed.protocol === 'https:' || parsed.protocol === 'http:') &&
+      !isLocalOrPrivateHost(parsed.hostname) &&
+      !isAiStudioPreviewHost(parsed.hostname)
+    ) {
+      return parsed.origin.replace(/\/+$/, '');
+    }
+  } catch {}
+  return null;
+}
+
+function getPublishedWebsiteOrigin(): string | null {
+  if (typeof window === 'undefined') return null;
+  return normalizeCanonicalPublicUrl(window.location.origin);
+}
+
 export default function TableManager() {
   const { tables, allTables, loading, addTable, toggleTableActive, deleteTable, refresh } = useTable();
   const [tableNumber, setTableNumber] = useState('');
@@ -11,32 +60,46 @@ export default function TableManager() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Determine base URL following the APP_URL pattern or default to local Wi-Fi IP for mobile scanning
-  const envUrl = import.meta.env.VITE_APP_URL || import.meta.env.APP_URL;
-  const initialBaseUrl = (envUrl && typeof envUrl === 'string' && !envUrl.includes('MY_APP_URL'))
-    ? envUrl.replace(/\/$/, '')
-    : (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+  // On the published website, use window.location.origin.
+  // Inside AI Studio previews (ais-dev-*.run.app / ais-pre-*.run.app) or local dev, use VITE_APP_URL (never the preview host).
+  const publishedWebsiteOrigin = getPublishedWebsiteOrigin();
+  const configuredEnvPublicUrl =
+    normalizeCanonicalPublicUrl(import.meta.env.VITE_APP_URL) ||
+    normalizeCanonicalPublicUrl(import.meta.env.APP_URL);
+  const initialPublicOnlineUrl =
+    publishedWebsiteOrigin || configuredEnvPublicUrl || DEFAULT_CANONICAL_PUBLIC_URL;
 
-  const [baseUrl, setBaseUrl] = useState<string>(initialBaseUrl);
+  const [baseUrl, setBaseUrl] = useState<string>(initialPublicOnlineUrl);
   const [detectedIpUrl, setDetectedIpUrl] = useState<string>('http://10.14.5.42:3000');
-  const [publicOnlineUrl, setPublicOnlineUrl] = useState<string>(initialBaseUrl);
+  const [publicOnlineUrl, setPublicOnlineUrl] = useState<string>(initialPublicOnlineUrl);
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
 
   const detectNetworkIp = async () => {
     setIsDetecting(true);
     try {
+      const publishedOrigin = getPublishedWebsiteOrigin();
+      const envPublicUrl =
+        normalizeCanonicalPublicUrl(import.meta.env.VITE_APP_URL) ||
+        normalizeCanonicalPublicUrl(import.meta.env.APP_URL);
       const res = await fetch('/api/network-info');
       if (res.ok) {
         const data = await res.json();
-        if (data.publicUrl) {
-          setPublicOnlineUrl(data.publicUrl);
-          setBaseUrl(data.publicUrl);
-        } else if (data.url) {
-          setBaseUrl(data.url);
-        }
+        const serverPublicUrl = normalizeCanonicalPublicUrl(data.publicUrl);
+        const resolvedPublicUrl =
+          publishedOrigin ||
+          envPublicUrl ||
+          serverPublicUrl ||
+          DEFAULT_CANONICAL_PUBLIC_URL;
+        setPublicOnlineUrl(resolvedPublicUrl);
+        setBaseUrl(resolvedPublicUrl);
         if (data.localUrl) {
           setDetectedIpUrl(data.localUrl);
         }
+      } else {
+        const fallbackPublicUrl =
+          publishedOrigin || envPublicUrl || DEFAULT_CANONICAL_PUBLIC_URL;
+        setPublicOnlineUrl(fallbackPublicUrl);
+        setBaseUrl(fallbackPublicUrl);
       }
     } catch (e) {
       console.warn('Could not auto-detect network info:', e);
@@ -49,8 +112,13 @@ export default function TableManager() {
     detectNetworkIp();
   }, []);
 
+  const normalizedBaseUrl = baseUrl.trim().replace(/\/+$/, '');
+  const normalizedPublicOnlineUrl = publicOnlineUrl.trim().replace(/\/+$/, '');
+  const normalizedDetectedIpUrl = detectedIpUrl.trim().replace(/\/+$/, '');
+
   const getTableUrl = (tableId: string) => {
-    return `${baseUrl}/?table=${tableId}`;
+    const cleanBase = baseUrl.trim().replace(/\/+$/, '');
+    return `${cleanBase}/?table=${tableId}`;
   };
 
   const handleCopyLink = async (tableId: string) => {
@@ -203,12 +271,12 @@ export default function TableManager() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {publicOnlineUrl && (
+            {normalizedPublicOnlineUrl && (
               <button
                 type="button"
-                onClick={() => setBaseUrl(publicOnlineUrl)}
+                onClick={() => setBaseUrl(normalizedPublicOnlineUrl)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors border ${
-                  baseUrl === publicOnlineUrl
+                  normalizedBaseUrl === normalizedPublicOnlineUrl
                     ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                     : 'bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100'
                 }`}
@@ -219,9 +287,9 @@ export default function TableManager() {
             )}
             <button
               type="button"
-              onClick={() => setBaseUrl(detectedIpUrl)}
+              onClick={() => setBaseUrl(normalizedDetectedIpUrl)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors border ${
-                baseUrl === detectedIpUrl
+                normalizedBaseUrl === normalizedDetectedIpUrl
                   ? 'bg-emerald-600 text-white border-emerald-600'
                   : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
               }`}
@@ -233,7 +301,7 @@ export default function TableManager() {
               type="button"
               onClick={() => setBaseUrl('http://localhost:3000')}
               className={`px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors border ${
-                baseUrl === 'http://localhost:3000'
+                normalizedBaseUrl === 'http://localhost:3000'
                   ? 'bg-neutral-800 text-white border-neutral-800'
                   : 'bg-neutral-100 text-neutral-700 border-neutral-200 hover:bg-neutral-200'
               }`}

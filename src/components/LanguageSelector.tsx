@@ -82,14 +82,14 @@ export const LanguageSelector: React.FC = () => {
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`${t.select_language || 'Select language'}. ${currentLanguage.name}`}
-        className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1.5 rounded-full text-xs font-medium tracking-wide text-text-primary hover:text-accent hover:bg-border/30 transition-all border border-border/60 focus:outline-none focus:ring-1 focus:ring-accent"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm text-xs font-medium text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors border border-border whitespace-nowrap shrink-0"
       >
-        <Globe className="w-3.5 h-3.5 md:w-4 md:h-4 text-text-secondary shrink-0" aria-hidden="true" />
-        <span className="truncate max-w-[85px] sm:max-w-[120px] text-xs font-serif font-medium">
+        <Globe className="w-3.5 h-3.5 text-text-muted shrink-0" aria-hidden="true" />
+        <span className="truncate max-w-[85px] sm:max-w-[110px]">
           {currentLanguage.name}
         </span>
         <ChevronDown 
-          className={`w-3 h-3 text-text-muted transition-transform duration-200 shrink-0 ${
+          className={`w-3 h-3 text-text-muted transition-transform duration-150 shrink-0 ${
             isOpen ? 'rotate-180' : ''
           }`} 
           aria-hidden="true"
@@ -101,11 +101,11 @@ export const LanguageSelector: React.FC = () => {
           id="language-dropdown-menu"
           role="listbox"
           aria-label={t.select_language || 'Available languages'}
-          className={`absolute z-50 mt-2 min-w-[210px] w-56 max-h-80 overflow-y-auto bg-bg-primary border border-border shadow-xl rounded-md py-1.5 text-xs text-text-primary transition-all duration-150 animate-in fade-in zoom-in-95 ${
+          className={`absolute z-50 mt-2 min-w-[210px] w-56 max-h-80 overflow-y-auto bg-bg-primary border border-border shadow-lg rounded-sm py-1 text-xs text-text-primary ${
             isRTL ? 'left-0 origin-top-left' : 'right-0 origin-top-right'
           }`}
         >
-          <div className="px-3 py-1.5 border-b border-border/50 text-[10px] font-bold uppercase tracking-wider text-text-muted">
+          <div className="px-3 py-2 border-b border-border text-xs font-medium text-text-muted">
             {t.select_language || 'Select Language'}
           </div>
 

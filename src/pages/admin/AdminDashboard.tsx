@@ -1,87 +1,121 @@
 import React from 'react';
 import { useOrder } from '../../context/OrderContext';
 import { useMenu } from '../../context/MenuContext';
-import { DollarSign, ShoppingBag, Clock } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency';
 import { isPayableOrder } from '../../services/billingService';
+
+const STATUS_TEXT_CLASS: Record<string, string> = {
+  completed: 'text-emerald-700',
+  cancelled: 'text-red-700',
+  ready: 'text-blue-700',
+  preparing: 'text-blue-700',
+  pending: 'text-amber-700',
+};
 
 export default function AdminDashboard() {
   const { orders } = useOrder();
   const { categories } = useMenu();
   
-  const todayOrders = orders.filter(o => new Date(o.createdAt).toDateString() === new Date().toDateString());
+  const todayOrders = orders.filter(
+    (o) => new Date(o.createdAt).toDateString() === new Date().toDateString()
+  );
   const todayRevenue = todayOrders
     .filter((o) => isPayableOrder(o))
     .reduce((sum, o) => sum + o.total, 0);
-  const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'preparing');
-  
+  const activeOrders = orders.filter((o) => o.status === 'pending' || o.status === 'preparing');
   const totalItems = categories.reduce((sum, cat) => sum + cat.items.length, 0);
 
   return (
-    <div>
-      <h1 className="text-3xl font-serif text-text-primary mb-8">Dashboard</h1>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-2xl sm:text-3xl font-serif font-medium text-text-primary tracking-tight">
+          Dashboard
+        </h1>
+        <p className="text-sm text-text-secondary mt-1">
+          Daily revenue summary, active kitchen workload, and recent order activity.
+        </p>
+      </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="bg-white p-6 border border-border rounded-sm flex items-start gap-4">
-          <div className="w-12 h-12 bg-green-50 text-green-600 rounded-full flex items-center justify-center shrink-0">
-            <DollarSign className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-sm text-text-secondary mb-1">Today's Revenue</p>
-            <h3 className="text-2xl font-bold">{formatCurrency(todayRevenue)}</h3>
-          </div>
+      {/* Flat 3-Column KPI Strip */}
+      <div className="grid grid-cols-1 md:grid-cols-3 bg-white border border-border rounded-sm divide-y md:divide-y-0 md:divide-x divide-border">
+        <div className="p-6">
+          <p className="text-xs font-medium text-text-muted mb-2">Today's Revenue</p>
+          <p className="text-2xl font-mono tabular-nums font-medium text-text-primary">
+            {formatCurrency(todayRevenue)}
+          </p>
+          <p className="text-xs text-text-secondary mt-1 font-mono tabular-nums">
+            {todayOrders.length} {todayOrders.length === 1 ? 'order' : 'orders'} today
+          </p>
         </div>
         
-        <div className="bg-white p-6 border border-border rounded-sm flex items-start gap-4">
-          <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shrink-0">
-            <ShoppingBag className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-sm text-text-secondary mb-1">Active Orders</p>
-            <h3 className="text-2xl font-bold">{pendingOrders.length}</h3>
-          </div>
+        <div className="p-6">
+          <p className="text-xs font-medium text-text-muted mb-2">Active Orders</p>
+          <p className="text-2xl font-mono tabular-nums font-medium text-text-primary">
+            {activeOrders.length}
+          </p>
+          <p className="text-xs text-text-secondary mt-1">
+            Pending confirmation or preparing
+          </p>
         </div>
         
-        <div className="bg-white p-6 border border-border rounded-sm flex items-start gap-4">
-          <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-full flex items-center justify-center shrink-0">
-            <Clock className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-sm text-text-secondary mb-1">Total Menu Items</p>
-            <h3 className="text-2xl font-bold">{totalItems}</h3>
-          </div>
+        <div className="p-6">
+          <p className="text-xs font-medium text-text-muted mb-2">Menu Catalog</p>
+          <p className="text-2xl font-mono tabular-nums font-medium text-text-primary">
+            {totalItems}
+          </p>
+          <p className="text-xs text-text-secondary mt-1 font-mono tabular-nums">
+            Across {categories.length} categories
+          </p>
         </div>
       </div>
 
-      <div className="bg-white border border-border rounded-sm p-8">
-        <h2 className="text-xl font-serif text-text-primary mb-6">Recent Activity</h2>
+      {/* Recent Activity Ledger */}
+      <div className="bg-white border border-border rounded-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-border flex items-baseline justify-between">
+          <h2 className="text-lg font-serif font-medium text-text-primary">Recent Activity</h2>
+          <span className="text-xs font-mono tabular-nums text-text-muted">
+            Latest {Math.min(orders.length, 5)} of {orders.length}
+          </span>
+        </div>
+
         {orders.length === 0 ? (
-          <p className="text-text-secondary text-sm">No recent activity.</p>
+          <p className="px-6 py-10 text-text-secondary text-sm text-center">No recent activity.</p>
         ) : (
-          <div className="flex flex-col gap-4">
-            {orders.slice(0, 5).map(order => (
-              <div key={order.id} className="flex justify-between items-center py-3 border-b border-border/50 last:border-0">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-text-primary">Order #{order.id}</p>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-border bg-border/20 text-text-secondary">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="bg-bg-primary border-b border-border text-xs font-medium text-text-muted">
+                <tr>
+                  <th className="px-6 py-3 font-medium">Order</th>
+                  <th className="px-6 py-3 font-medium">Seating</th>
+                  <th className="px-6 py-3 font-medium">Time</th>
+                  <th className="px-6 py-3 font-medium">Status</th>
+                  <th className="px-6 py-3 font-medium text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {orders.slice(0, 5).map((order) => (
+                  <tr key={order.id} className="hover:bg-bg-primary/60 transition-colors">
+                    <td className="px-6 py-3.5 font-mono text-xs font-medium text-text-primary">
+                      #{order.id}
+                    </td>
+                    <td className="px-6 py-3.5 text-xs text-text-secondary">
                       {order.tableId && order.tableId !== 'COUNTER' ? `Table ${order.tableId}` : 'Counter'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-text-secondary">{new Date(order.createdAt).toLocaleTimeString()}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-text-primary">{formatCurrency(order.total)}</p>
-                  <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm ${
-                    order.status === 'completed' ? 'bg-green-100 text-green-700' :
-                    order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                    'bg-orange-100 text-orange-700'
-                  }`}>
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+                    </td>
+                    <td className="px-6 py-3.5 font-mono tabular-nums text-xs text-text-secondary">
+                      {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td className="px-6 py-3.5 text-xs">
+                      <span className={`font-medium capitalize ${STATUS_TEXT_CLASS[order.status] || 'text-text-secondary'}`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5 text-right font-mono tabular-nums text-xs font-medium text-text-primary">
+                      {formatCurrency(order.total)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

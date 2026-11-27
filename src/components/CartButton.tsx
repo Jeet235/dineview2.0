@@ -30,13 +30,13 @@ export const CartButton: React.FC<CartButtonProps> = ({
       <button 
         type="button"
         onClick={handleNavigateToCart}
-        className={`relative flex items-center justify-center p-2 text-text-secondary hover:text-text-primary transition-colors ${className}`}
+        className={`relative inline-flex items-center gap-1.5 px-2 py-1.5 text-text-secondary hover:text-text-primary transition-colors rounded-sm whitespace-nowrap shrink-0 ${className}`}
         aria-label={translations['nav_cart'] || 'Cart'}
       >
-        <ShoppingBag className="w-5 h-5" />
+        <ShoppingBag className="w-4 h-4 shrink-0" />
         {itemCount > 0 && (
-          <span className="absolute top-0 end-0 w-4 h-4 bg-accent text-white text-[9px] font-bold flex items-center justify-center rounded-full">
-            {itemCount}
+          <span className="text-xs font-mono tabular-nums font-medium text-text-primary">
+            ({itemCount})
           </span>
         )}
       </button>
@@ -48,23 +48,19 @@ export const CartButton: React.FC<CartButtonProps> = ({
 
   return (
     <div 
-      className={`fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 end-4 sm:end-6 z-40 animate-in fade-in slide-in-from-bottom-4 duration-200 ${className}`}
+      className={`fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:bottom-6 end-4 sm:end-6 z-40 ${className}`}
     >
       <button
         type="button"
         onClick={handleNavigateToCart}
-        className="flex items-center gap-2.5 sm:gap-3 bg-text-primary text-white px-4 sm:px-5 py-3 sm:py-3.5 rounded-full shadow-2xl hover:bg-[#333] hover:scale-105 active:scale-95 transition-all text-[11px] sm:text-xs font-bold tracking-wider uppercase border border-white/10"
+        className="flex items-center gap-3 bg-text-primary text-bg-primary px-4 sm:px-5 py-3 rounded-sm shadow-lg hover:bg-text-primary/90 transition-colors text-xs font-medium tracking-wide border border-white/10 whitespace-nowrap"
         aria-label={translations['view_cart'] || 'View Cart'}
       >
-        <div className="relative">
-          <ShoppingBag className="w-4 h-4" />
-          <span className="absolute -top-1.5 -end-2 w-3.5 h-3.5 bg-accent text-white text-[8px] font-bold flex items-center justify-center rounded-full">
-            {itemCount}
-          </span>
-        </div>
+        <ShoppingBag className="w-4 h-4 shrink-0" />
         <span>{translations['view_cart'] || 'View Cart'}</span>
-        <span className="w-1 h-1 rounded-full bg-white/40" />
-        <span className="font-serif tracking-normal font-medium">{formatCurrency(total)}</span>
+        <span className="font-mono tabular-nums text-bg-primary/70">({itemCount})</span>
+        <span className="h-3.5 w-px bg-bg-primary/25" aria-hidden="true" />
+        <span className="font-mono tabular-nums font-medium">{formatCurrency(total)}</span>
       </button>
     </div>
   );

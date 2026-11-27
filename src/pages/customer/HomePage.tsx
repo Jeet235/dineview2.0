@@ -2,15 +2,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CategoryNav } from '../../components/CategoryNav';
 import { MenuSection } from '../../components/MenuSection';
 import { CartButton } from '../../components/CartButton';
-import { MapPin, Clock } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { useMenu } from '../../context/MenuContext';
 import { saveMenuScrollPosition, getAndClearMenuScrollPosition } from '../../utils/scrollRestoration';
+import heroDiningImg from '../../assets/images/hero_dineview_dining_room_1795754444622.jpg';
 
 export default function HomePage() {
   const { categories } = useMenu();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || '');
   const [reservationNotice, setReservationNotice] = useState<string | null>(null);
+  const [heroLoaded, setHeroLoaded] = useState<boolean>(true);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const location = useLocation();
   const { lang, t } = useOutletContext<{ lang: string; t: Record<string, string>; isRTL?: boolean }>();
@@ -28,10 +30,8 @@ export default function HomePage() {
     const savedY = getAndClearMenuScrollPosition();
     if (savedY !== null && savedY > 0) {
       isRestoringScrollRef.current = true;
-      // Immediate scroll restoration
       window.scrollTo(0, savedY);
 
-      // Re-apply on animation frames and short timeout to ensure DOM paint/layout stability
       const rafId = requestAnimationFrame(() => {
         window.scrollTo(0, savedY);
       });
@@ -58,7 +58,6 @@ export default function HomePage() {
   // Auto-scroll to matching section when navigating to /menu, /locations
   useEffect(() => {
     if (isRestoringScrollRef.current) {
-      // Do not overwrite restored scroll position when returning from item details
       return;
     }
     const path = location.pathname.replace(/^\//, '');
@@ -99,7 +98,7 @@ export default function HomePage() {
     }
     const element = document.getElementById(sectionId);
     if (element) {
-      const yOffset = -80; // Account for top nav
+      const yOffset = -68;
       const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
@@ -107,46 +106,61 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Hero / Cover Image */}
-      <div className="w-full h-[42vh] md:h-[80vh] relative bg-border flex flex-col justify-center items-center text-center px-6">
-        <img
-          src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=800&auto=format&fit=crop"
-          alt="DineView Restaurant Interior"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="relative z-10 flex flex-col items-center">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-6 tracking-tight">DineView</h1>
-          <p className="text-white/90 text-[10px] md:text-xs uppercase tracking-[0.3em] font-bold mb-10">{t.hero_subtitle}</p>
-        </div>
-      </div>
+      {/* Editorial Hero Showcase */}
+      <section className="w-full h-[46vh] md:h-[68vh] min-h-[340px] max-h-[680px] relative bg-[#161615] flex flex-col justify-end overflow-hidden">
+        {heroLoaded && (
+          <img
+            src={heroDiningImg}
+            alt="DineView architectural dining room interior with limestone tables and warm pendant lighting"
+            className="absolute inset-0 w-full h-full object-cover"
+            referrerPolicy="no-referrer"
+            onError={() => setHeroLoaded(false)}
+          />
+        )}
+        {/* Measured scrim guaranteeing >=4.5:1 text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/15" />
 
-      {/* Restaurant Info Bar */}
-      <div className="bg-bg-primary border-b border-border py-4 md:py-6 px-6 md:px-12">
-        <div className="max-w-4xl mx-auto flex flex-col md:flex-row flex-wrap gap-4 md:gap-10 text-[10px] md:text-xs uppercase tracking-widest text-text-secondary font-bold justify-start items-start md:items-center">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-text-muted" />
-              <span>{t.location}</span>
-            </div>
-            <a 
-              href="https://maps.google.com/?q=123+Culinary+Ave,+Food+District" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="border border-border text-text-primary px-3 py-1.5 rounded-full text-[9px] font-bold uppercase tracking-widest hover:bg-border/50 hover:scale-105 active:scale-95 transition-all hidden sm:block"
-            >
-              {t.directions}
-            </a>
+        <div className="relative z-10 max-w-6xl w-full mx-auto px-4 sm:px-8 pb-10 md:pb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="max-w-2xl">
+            <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] font-serif font-medium text-white tracking-tight leading-[1.05] mb-3">
+              DineView
+            </h1>
+            <p className="text-white/85 text-sm sm:text-base font-normal leading-relaxed max-w-xl">
+              {t.hero_subtitle}
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-text-muted" />
+          <button
+            type="button"
+            onClick={(e) => scrollToSection('menu', e)}
+            className="self-start md:self-end bg-white text-text-primary px-6 py-3 rounded-sm text-sm font-medium hover:bg-bg-secondary transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            {t.nav_menu || 'Explore Menu'}
+          </button>
+        </div>
+      </section>
+
+      {/* Unboxed Editorial Info Bar */}
+      <div className="bg-bg-primary border-b border-border py-4">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs sm:text-sm text-text-secondary">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="text-text-primary font-medium">{t.location}</span>
+            <span aria-hidden="true" className="text-text-muted">·</span>
             <span>{t.daily} {t.open_time}</span>
           </div>
+          <a
+            href="https://maps.google.com/?q=123+Culinary+Ave,+Food+District"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-text-primary hover:text-accent hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+          >
+            <span>{t.directions}</span>
+            <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+          </a>
         </div>
       </div>
 
       {/* Menu Area Anchor */}
-      <div id="menu" className="scroll-mt-20"></div>
+      <div id="menu" className="scroll-mt-16" />
 
       {/* Sticky Category Navigation */}
       <CategoryNav
@@ -157,11 +171,11 @@ export default function HomePage() {
       />
 
       {/* Main Menu Content */}
-      <main className="max-w-4xl mx-auto px-6 md:px-12 pb-24 w-full">
+      <main className="max-w-6xl mx-auto px-4 sm:px-8 pb-24 w-full">
         {categories.length === 0 ? (
           <div className="py-24 text-center">
-            <div className="inline-block w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-text-secondary text-sm font-serif">Loading chef's selections...</p>
+            <div className="inline-block w-6 h-6 border-2 border-accent border-t-transparent rounded-full animate-spin mb-4" />
+            <p className="text-text-secondary text-sm">Loading seasonal menu...</p>
           </div>
         ) : (
           categories.map((category) => (
@@ -177,27 +191,33 @@ export default function HomePage() {
       </main>
 
       {/* Locations Section */}
-      <section id="locations" className="py-24 px-6 md:px-12 border-t border-border bg-border/30 scroll-mt-20">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-6 leading-tight">{t.nav_locations}</h2>
-          <p className="text-text-secondary leading-relaxed mb-10 max-w-sm mx-auto">
-            {t.location}<br/>
-            {t.daily} {t.open_time}
-          </p>
-          <button 
-            onClick={() => {
-              setReservationNotice(t.reservation_coming_soon || 'Table reservation system coming soon!');
-              setTimeout(() => setReservationNotice(null), 4000);
-            }} 
-            className="bg-text-primary text-white px-8 py-3.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-[#333] hover:scale-105 active:scale-95 transition-all"
-          >
-            {t.book || 'Reserve'}
-          </button>
-          {reservationNotice && (
-            <p className="mt-4 text-xs font-serif text-accent animate-in fade-in">
-              {reservationNotice}
+      <section id="locations" className="py-20 border-t border-border bg-bg-secondary/60 scroll-mt-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="max-w-lg">
+            <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-3 leading-tight">
+              {t.nav_locations}
+            </h2>
+            <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
+              {t.location}
+              <span className="mx-2 text-text-muted" aria-hidden="true">·</span>
+              {t.daily} {t.open_time}
             </p>
-          )}
+            {reservationNotice && (
+              <p className="mt-4 text-sm text-accent font-medium">
+                {reservationNotice}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setReservationNotice(t.reservation_coming_soon || 'Table reservation system coming soon.');
+              setTimeout(() => setReservationNotice(null), 4000);
+            }}
+            className="self-start md:self-end bg-text-primary text-white px-6 py-3 rounded-sm text-sm font-medium hover:bg-[#2E2E2C] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+          >
+            {t.book || 'Reserve a Table'}
+          </button>
         </div>
       </section>
 

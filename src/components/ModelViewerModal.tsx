@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { X, Box, Loader2, Sparkles, Smartphone, RotateCcw } from 'lucide-react';
+import { X, Box, Loader2, Smartphone, Info } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export interface ModelViewerModalProps {
@@ -407,22 +407,16 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
           setToast(null);
           setShowModal(true);
         }}
-        className={buttonClassName || "flex items-center gap-1.5 h-8 px-3 rounded-full border border-border text-text-secondary hover:text-text-primary hover:border-text-secondary transition-colors tracking-widest font-bold text-[9px] uppercase"}
+        className={buttonClassName || "inline-flex items-center gap-1.5 h-8 px-3 rounded-sm border border-border bg-bg-primary text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors text-xs font-medium whitespace-nowrap shrink-0"}
         title="View dish in 3D and Augmented Reality"
       >
-        <Box className={iconClassName || "w-3 h-3"} />
-        <span>{t.view_3d || 'VIEW IN 3D'}</span>
+        <Box className={iconClassName || "w-3.5 h-3.5 shrink-0"} />
+        <span>{t.view_3d || '3D View'}</span>
       </button>
 
-      {/* 
-        3D & AR Interactive Modal Dialog:
-        - Interactive 3D model with 360-degree rotation and zoom
-        - High-visibility "View in AR" button for supported mobile devices
-        - Non-blocking error handling and responsive layout
-      */}
       {showModal && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-bg-primary/95 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-950/80 backdrop-blur-sm p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) setShowModal(false);
           }}
@@ -430,11 +424,12 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
           aria-modal="true"
           aria-labelledby="modal-3d-title"
         >
-          <div className="relative w-full max-w-4xl h-[82vh] md:h-[85vh] bg-bg-secondary border border-border shadow-2xl rounded-sm flex flex-col overflow-hidden">
+          <div className="relative w-full max-w-4xl h-[82vh] md:h-[85vh] bg-bg-primary border border-border shadow-xl rounded-sm flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 md:p-6 border-b border-border/50 bg-bg-primary/40">
-              <h3 id="modal-3d-title" className="font-serif text-xl md:text-2xl text-text-primary flex items-center">
-                {itemName} <span className="text-text-secondary text-sm md:text-base font-sans font-normal ml-2">{t.in_3d || 'in 3D'}</span>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-bg-primary">
+              <h3 id="modal-3d-title" className="font-serif text-xl md:text-2xl text-text-primary flex items-baseline gap-2">
+                <span>{itemName}</span>
+                <span className="text-text-muted text-sm font-sans font-normal">{t.in_3d || '3D Preview'}</span>
               </h3>
               
               <div className="flex items-center gap-2 md:gap-3">
@@ -443,17 +438,17 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
                   type="button"
                   onClick={handleLaunchAR}
                   disabled={isLaunchingAr && !arReadyToActivate}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase transition-all active:scale-95 shadow-sm ${
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-sm text-xs font-medium transition-colors whitespace-nowrap shrink-0 ${
                     arReadyToActivate
-                      ? 'bg-amber-500 hover:bg-amber-400 text-neutral-950 font-extrabold ring-2 ring-amber-300 animate-pulse'
-                      : 'bg-accent text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed'
+                      ? 'bg-accent text-white hover:bg-accent/90'
+                      : 'bg-text-primary text-bg-primary hover:bg-text-primary/90 disabled:opacity-50 disabled:cursor-not-allowed'
                   }`}
                   title={arReadyToActivate ? "Tap to place dish on table" : isModelLoaded ? "View on your table with Augmented Reality" : "Loading 3D model…"}
                 >
                   {isLaunchingAr ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   ) : (
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <Smartphone className="w-3.5 h-3.5" />
                   )}
                   <span>
                     {isLaunchingAr 
@@ -467,10 +462,10 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
                 <button 
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="p-2 text-text-secondary hover:text-text-primary hover:bg-border/50 rounded-full transition-colors"
+                  className="p-2 text-text-secondary hover:text-text-primary hover:bg-bg-secondary rounded-sm transition-colors"
                   aria-label={t.close_3d || 'Close 3D viewer'}
                 >
-                  <X className="w-5 h-5 md:w-6 md:h-6" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
@@ -534,19 +529,17 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
                     type="button"
                     onClick={handleLaunchAR}
                     disabled={isLaunchingAr && !arReadyToActivate}
-                    className={`absolute bottom-5 right-5 z-10 flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-xl transition-all cursor-pointer border ${
+                    className={`absolute bottom-5 right-5 z-10 flex items-center gap-2 px-4 py-2.5 rounded-sm text-xs font-medium shadow-md transition-colors cursor-pointer border whitespace-nowrap ${
                       arReadyToActivate
-                        ? 'bg-amber-500 hover:bg-amber-400 text-neutral-950 font-extrabold ring-4 ring-amber-400/40 animate-bounce'
-                        : 'bg-neutral-900/95 text-white backdrop-blur-md hover:bg-black hover:scale-105 active:scale-95 border-neutral-700/60 disabled:opacity-50 disabled:cursor-not-allowed'
+                        ? 'bg-accent hover:bg-accent/90 text-white border-accent'
+                        : 'bg-text-primary text-bg-primary hover:bg-text-primary/90 border-white/10 disabled:opacity-50 disabled:cursor-not-allowed'
                     }`}
                     title={arReadyToActivate ? "Tap to place dish on table" : isModelLoaded ? "View on your table with Augmented Reality" : "Loading 3D model…"}
                   >
                     {isLaunchingAr ? (
-                      <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
-                    ) : arReadyToActivate ? (
-                      <Sparkles className="w-4 h-4 text-neutral-950" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      <Smartphone className="w-4 h-4 text-amber-400" />
+                      <Smartphone className="w-4 h-4" />
                     )}
                     <span>
                       {isLaunchingAr 
@@ -559,16 +552,16 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
 
                   {/* Loading progress overlay */}
                   {!isModelLoaded && !loadError && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/5 pointer-events-none transition-opacity duration-300">
-                      <div className="bg-neutral-900/90 text-white backdrop-blur-md px-5 py-4 rounded-2xl shadow-xl flex flex-col items-center gap-2.5 max-w-[220px] border border-neutral-700/60">
-                        <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
-                        <span className="text-[11px] font-medium text-neutral-200 tracking-wide text-center">
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/5 pointer-events-none">
+                      <div className="bg-text-primary/95 text-bg-primary px-5 py-4 rounded-sm shadow-lg flex flex-col items-center gap-2.5 max-w-[220px] border border-white/10">
+                        <Loader2 className="w-5 h-5 text-bg-primary animate-spin" />
+                        <span className="text-xs font-mono tabular-nums text-bg-primary/90 text-center">
                           {loadProgress > 0 ? `Loading 3D (${loadProgress}%)` : 'Preparing 3D model…'}
                         </span>
                         {loadProgress > 0 && (
-                          <div className="w-full h-1 bg-neutral-700/80 rounded-full overflow-hidden">
+                          <div className="w-full h-1 bg-white/20 overflow-hidden">
                             <div 
-                              className="h-full bg-amber-400 transition-all duration-200" 
+                              className="h-full bg-white transition-all duration-200" 
                               style={{ width: `${loadProgress}%` }} 
                             />
                           </div>
@@ -579,8 +572,8 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
 
                   {/* Load error & retry state */}
                   {loadError && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-bg-secondary/95 backdrop-blur-sm p-6 text-center">
-                      <Box className="w-10 h-10 text-text-muted mb-3 opacity-60" />
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-bg-secondary/95 p-6 text-center">
+                      <Box className="w-8 h-8 text-text-muted mb-3" />
                       <p className="text-sm text-text-primary font-medium mb-1">{loadError}</p>
                       <p className="text-xs text-text-secondary mb-4">The 3D model could not be displayed.</p>
                       <button
@@ -598,7 +591,7 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
                             }, 50);
                           }
                         }}
-                        className="px-4 py-2 bg-text-primary text-white text-xs font-bold uppercase tracking-wider rounded-full hover:bg-text-secondary transition-colors"
+                        className="px-4 py-2 bg-text-primary text-bg-primary text-xs font-medium rounded-sm hover:bg-text-primary/90 transition-colors"
                       >
                         Retry Loading
                       </button>
@@ -607,45 +600,45 @@ export const ModelViewerModal: React.FC<ModelViewerModalProps> = ({
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center gap-3">
-                  <Loader2 className="w-8 h-8 text-accent animate-spin" />
-                  <span className="text-xs text-text-secondary font-medium tracking-wide uppercase">
-                    Loading 3D Engine…
+                  <Loader2 className="w-6 h-6 text-accent animate-spin" />
+                  <span className="text-xs text-text-secondary font-medium">
+                    Loading 3D viewer…
                   </span>
                 </div>
               )}
             </div>
             
             {/* Footer helper info */}
-            <div className="p-4 bg-bg-secondary border-t border-border/50 flex flex-col sm:flex-row items-center justify-between text-xs md:text-sm text-text-muted gap-2">
-              <span>{t.instructions_3d || 'Drag to rotate • Pinch or scroll to zoom'}</span>
-              <span className="text-[11px] font-sans text-text-muted/80 flex items-center gap-1.5">
-                <Box className="w-3.5 h-3.5 text-accent" />
-                <span>Supports WebXR & 360° Inspection</span>
+            <div className="px-5 py-3.5 bg-bg-primary border-t border-border flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-2">
+              <span>{t.instructions_3d || 'Drag to rotate · Pinch or scroll to zoom'}</span>
+              <span className="flex items-center gap-1.5">
+                <Box className="w-3.5 h-3.5 text-text-secondary" />
+                <span>WebXR & 360° Inspection</span>
               </span>
             </div>
 
             {/* In-Modal Toast Notification */}
             {toast && (
               <div 
-                className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[120] max-w-[90%] sm:max-w-md w-full px-4 animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto"
+                className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[120] max-w-[90%] sm:max-w-md w-full px-4 pointer-events-auto"
                 role="status"
                 aria-live="polite"
               >
-                <div className="bg-neutral-900/95 text-white backdrop-blur-md border border-neutral-700/80 rounded-xl px-4 py-2.5 shadow-2xl flex items-center justify-between gap-3 text-xs md:text-sm">
+                <div className="bg-text-primary text-bg-primary border border-white/15 rounded-sm px-4 py-2.5 shadow-lg flex items-center justify-between gap-3 text-xs">
                   <div className="flex items-center gap-2.5 min-w-0">
                     {toast.type === 'loading' ? (
-                      <Loader2 className="w-4 h-4 text-amber-400 animate-spin shrink-0" />
+                      <Loader2 className="w-4 h-4 animate-spin shrink-0" />
                     ) : (
-                      <span className="flex h-2 w-2 rounded-full bg-amber-400 shrink-0" />
+                      <Info className="w-4 h-4 shrink-0 text-bg-primary/70" />
                     )}
-                    <p className="font-medium text-neutral-200 leading-snug">
+                    <p className="text-bg-primary/90 leading-snug">
                       {toast.message}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setToast(null)}
-                    className="p-1 text-neutral-400 hover:text-white rounded-md transition-colors shrink-0"
+                    className="p-1 text-bg-primary/60 hover:text-bg-primary rounded-sm transition-colors shrink-0"
                     aria-label="Dismiss message"
                   >
                     <X className="w-4 h-4" />

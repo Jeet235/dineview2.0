@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useMenu } from '../../context/MenuContext';
-import { ChevronLeft, Plus, Minus, Flame, Footprints, Box } from 'lucide-react';
+import { ChevronLeft, Plus, Minus, UtensilsCrossed } from 'lucide-react';
 import { formatCurrency } from '../../utils/currency';
 import { ModelViewerModal } from '../../components/ModelViewerModal';
 import { getMenuItemName, getMenuItemDescription } from '../../data/menu';
@@ -13,10 +13,12 @@ export default function ItemDetailsPage() {
   const { lang, t } = useOutletContext<{ lang: string; t: Record<string, string>; isRTL?: boolean }>();
   const { items, addItem, updateQuantity } = useCart();
   const { categories } = useMenu();
+  const [imgError, setImgError] = useState(false);
 
   // Automatically scroll to top whenever navigating to an item details page or switching items
   useEffect(() => {
     window.scrollTo(0, 0);
+    setImgError(false);
   }, [id]);
 
   // Find item by ID across all categories
@@ -24,11 +26,12 @@ export default function ItemDetailsPage() {
 
   if (!item) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center py-24">
         <h2 className="text-2xl font-serif text-text-primary mb-4">{t.item_not_found || 'Item not found'}</h2>
         <button 
+          type="button"
           onClick={() => navigate(-1)}
-          className="bg-text-primary text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#333] transition-colors"
+          className="bg-text-primary text-bg-primary px-6 py-2.5 rounded-sm text-xs font-medium hover:bg-text-primary/90 transition-colors"
         >
           {t.go_back || 'Go Back'}
         </button>
@@ -38,31 +41,40 @@ export default function ItemDetailsPage() {
 
   const walkTime = Math.round(item.calories / 5);
   const existingCartItem = items.find((i) => i.id === item.id);
-  
   const actualModelUrl = item.modelUrl || item.modelUrlAr;
 
   const displayName = getMenuItemName(item, lang);
   const displayDescription = getMenuItemDescription(item, lang);
+  const dietaryLabels = (item.tags || []).map((tag) => t[`tag_${tag.id}`] || tag.label);
 
   return (
-    <div className="max-w-4xl mx-auto px-6 md:px-12 py-12 relative">
+    <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10 md:py-14 relative">
       <button 
+        type="button"
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors mb-8 font-bold uppercase tracking-widest text-[10px]"
+        className="inline-flex items-center gap-1.5 text-text-secondary hover:text-text-primary transition-colors mb-8 text-xs font-medium"
       >
         <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
-        {t.back_to_menu || 'Back to Menu'}
+        <span>{t.back_to_menu || 'Back to Menu'}</span>
       </button>
 
-      <div className="flex flex-col md:flex-row gap-12">
-        <div className="flex-1">
-          <div className="w-full aspect-square bg-border rounded-sm overflow-hidden relative">
-            <img 
-              src={item.image} 
-              alt={displayName} 
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-            />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-14 items-start">
+        <div>
+          <div className="w-full aspect-[4/3] sm:aspect-square bg-bg-secondary rounded-sm overflow-hidden border border-border relative flex items-center justify-center">
+            {item.image && !imgError ? (
+              <img 
+                src={item.image} 
+                alt={displayName} 
+                onError={() => setImgError(true)}
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-text-muted gap-2 p-6">
+                <UtensilsCrossed className="w-8 h-8 opacity-40" />
+                <span className="text-xs font-serif">{displayName}</span>
+              </div>
+            )}
           </div>
           
           {actualModelUrl && (
@@ -72,85 +84,89 @@ export default function ItemDetailsPage() {
               iosSrc={item.iosSrc}
               poster={item.image}
               itemName={displayName}
-              buttonClassName="mt-6 w-full flex items-center justify-center gap-2 border border-border text-text-primary px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-widest hover:border-text-secondary transition-colors"
+              buttonClassName="mt-4 w-full flex items-center justify-center gap-2 border border-border bg-bg-primary text-text-primary px-6 py-3 rounded-sm text-xs font-medium hover:border-text-primary transition-colors"
               iconClassName="w-4 h-4"
             />
           )}
         </div>
         
-        <div className="flex-1 flex flex-col justify-center">
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2 mb-4">
-              {item.tags?.map((tag) => (
-                <span
-                  key={tag.id}
-                  className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-sm border border-border/70 text-text-secondary"
-                >
-                  {t[`tag_${tag.id}`] || tag.label}
-                </span>
-              ))}
-            </div>
-            <h1 className="text-4xl md:text-5xl font-serif text-text-primary mb-4 leading-tight">{displayName}</h1>
-            <span className="text-2xl font-serif text-text-primary/90">{formatCurrency(item.price)}</span>
-          </div>
+        <div className="flex flex-col">
+          {dietaryLabels.length > 0 && (
+            <p className="text-xs text-accent font-medium mb-3">
+              {dietaryLabels.join(' · ')}
+            </p>
+          )}
 
-          <p className="text-base text-text-secondary leading-relaxed mb-8">
+          <h1 className="text-3xl sm:text-4xl font-serif font-medium text-text-primary mb-3 leading-tight tracking-tight">
+            {displayName}
+          </h1>
+
+          <p className="text-xl font-mono tabular-nums text-text-primary mb-6">
+            {formatCurrency(item.price)}
+          </p>
+
+          <p className="text-sm sm:text-base text-text-secondary leading-relaxed mb-8">
             {displayDescription}
           </p>
 
-          <div className="flex items-center gap-6 mb-12 text-sm font-medium text-text-muted">
-            <div className="flex items-center gap-2">
-              <Flame className="w-4 h-4" />
-              <span>{item.calories} {t.kcal || 'kcal'}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Footprints className="w-4 h-4" />
-              <span>{walkTime} {t.walk_min || 'min walk'}</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-10 pb-8 border-b border-border text-xs font-mono tabular-nums text-text-muted">
+            <span>{item.calories} {t.kcal || 'kcal'}</span>
+            <span aria-hidden="true">·</span>
+            <span>{walkTime} {t.walk_min || 'min walk'}</span>
           </div>
 
-          <div className="border-t border-border/50 pt-8 mt-auto">
+          <div>
             {existingCartItem ? (
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border border-border rounded-full p-1">
+              <div className="flex items-center gap-3">
+                <div className="inline-flex items-center border border-border rounded-sm bg-white h-11">
                   <button 
+                    type="button"
                     onClick={() => updateQuantity(existingCartItem.cartItemId, existingCartItem.quantity - 1)}
-                    className="p-2 text-text-secondary hover:text-text-primary transition-colors"
+                    className="h-full px-3.5 text-text-secondary hover:text-text-primary transition-colors"
+                    aria-label="Decrease quantity"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="w-8 text-center font-medium">{existingCartItem.quantity}</span>
+                  <span className="w-9 text-center text-sm font-mono tabular-nums font-medium text-text-primary">
+                    {existingCartItem.quantity}
+                  </span>
                   <button 
+                    type="button"
                     onClick={() => updateQuantity(existingCartItem.cartItemId, existingCartItem.quantity + 1)}
                     disabled={existingCartItem.quantity >= (item.maxPerOrder ?? 20)}
-                    className={`p-2 transition-colors ${
+                    className={`h-full px-3.5 transition-colors ${
                       existingCartItem.quantity >= (item.maxPerOrder ?? 20)
-                        ? 'text-text-muted cursor-not-allowed opacity-50'
+                        ? 'text-text-muted cursor-not-allowed opacity-40'
                         : 'text-text-secondary hover:text-text-primary'
                     }`}
+                    aria-label="Increase quantity"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
                 <button 
+                  type="button"
                   onClick={() => navigate('/cart')}
-                  className="flex-1 bg-text-primary text-white px-8 py-3.5 rounded-full text-[10px] font-bold uppercase tracking-widest hover:bg-[#333] transition-all hover:scale-105 active:scale-95 text-center"
+                  className="flex-1 h-11 bg-text-primary text-bg-primary px-6 rounded-sm text-xs font-medium hover:bg-text-primary/90 transition-colors text-center whitespace-nowrap"
                 >
                   {t.view_cart || 'View Cart'}
                 </button>
               </div>
             ) : (
               <button 
+                type="button"
                 onClick={() => addItem(item)}
                 disabled={item.maxPerOrder === 0}
-                className={`w-full px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                className={`w-full h-11 px-6 rounded-sm text-xs font-medium transition-colors flex items-center justify-center gap-2 ${
                   item.maxPerOrder === 0
-                    ? 'bg-text-muted text-white cursor-not-allowed opacity-50'
-                    : 'bg-text-primary text-white hover:bg-[#333] hover:scale-105 active:scale-95'
+                    ? 'bg-text-muted text-bg-primary cursor-not-allowed opacity-50'
+                    : 'bg-text-primary text-bg-primary hover:bg-text-primary/90'
                 }`}
               >
                 <Plus className="w-4 h-4" />
-                {t.add_to_cart || 'Add to Cart'} — {formatCurrency(item.price)}
+                <span>{t.add_to_cart || 'Add to Cart'}</span>
+                <span className="opacity-60">·</span>
+                <span className="font-mono tabular-nums">{formatCurrency(item.price)}</span>
               </button>
             )}
           </div>

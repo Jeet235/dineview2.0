@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Phone, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowRight, ShieldCheck, AlertCircle, Loader2 } from 'lucide-react';
 import { formatPhone, getCustomerProfile } from '../services/customerService';
 
 export const COUNTRY_CODES = [
@@ -90,41 +90,32 @@ export const PhoneGateModal: React.FC<PhoneGateModalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-[200] bg-neutral-950/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-300"
+      className="fixed inset-0 z-[200] bg-neutral-950/75 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="phone-gate-title"
     >
-      <div className="w-full max-w-md bg-white border border-border shadow-2xl rounded-sm p-6 sm:p-8 relative animate-in zoom-in-95 duration-200">
-        {/* Table & Branding Crest */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold uppercase tracking-widest mb-3">
-            <Sparkles className="w-3.5 h-3.5 animate-pulse" />
-            <span>AI Dining Concierge</span>
-          </div>
+      <div className="w-full max-w-md bg-bg-primary border border-border shadow-xl rounded-sm p-6 sm:p-8 relative">
+        {/* Table & Branding Header */}
+        <div className="mb-6">
+          <p className="text-xs font-medium text-accent mb-2">
+            DineView{tableId && tableId !== 'COUNTER' ? ` · ${tableName || `Table ${tableId}`}` : ''}
+          </p>
 
-          <h2 id="phone-gate-title" className="text-2xl sm:text-3xl font-serif text-text-primary mb-2">
+          <h2 id="phone-gate-title" className="text-2xl sm:text-3xl font-serif font-medium text-text-primary mb-2 tracking-tight">
             Welcome to DineView
           </h2>
           
-          <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
-            Please enter your mobile phone number to access the digital menu. Our AI Concierge will remember your dining preferences and past favorites.
+          <p className="text-sm text-text-secondary leading-relaxed">
+            Enter your mobile phone number to browse the menu, place table orders, and receive tailored dining suggestions.
           </p>
-
-          {/* Table Assignment Badge */}
-          {tableId && tableId !== 'COUNTER' && (
-            <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold">
-              <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-              <span>Ordering at {tableName || `Table ${tableId}`}</span>
-            </div>
-          )}
         </div>
 
         {/* Mandatory Phone Input Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-text-primary mb-2">
-              Mobile Phone Number <span className="text-red-500">*</span>
+            <label htmlFor="phone-gate-input" className="block text-xs font-medium text-text-primary mb-2">
+              Mobile Phone Number <span className="text-red-600">*</span>
             </label>
 
             <div className="flex gap-2">
@@ -135,7 +126,7 @@ export const PhoneGateModal: React.FC<PhoneGateModalProps> = ({
                   setCountryCode(e.target.value);
                   setError(null);
                 }}
-                className="border border-border bg-bg-primary px-3 py-2.5 rounded-sm text-xs font-medium text-text-primary focus:outline-none focus:border-text-primary shrink-0"
+                className="border border-border bg-white px-3 py-2.5 rounded-sm text-xs font-medium text-text-primary focus:outline-none focus:border-text-primary shrink-0"
                 aria-label="Country Code"
               >
                 {COUNTRY_CODES.map((c) => (
@@ -148,30 +139,31 @@ export const PhoneGateModal: React.FC<PhoneGateModalProps> = ({
               {/* Phone Input */}
               <div className="relative flex-1">
                 <input
+                  id="phone-gate-input"
                   type="tel"
                   inputMode="numeric"
                   autoFocus
                   required
                   value={phoneNumber}
                   onChange={handlePhoneChange}
-                  placeholder="10-digit mobile number"
-                  className={`w-full border ${
+                  placeholder={`${requiredDigits}-digit mobile number`}
+                  className={`w-full border bg-white ${
                     error ? 'border-red-500' : 'border-border'
-                  } px-3 py-2.5 rounded-sm text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-text-primary font-mono`}
+                  } px-3 py-2.5 rounded-sm text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-text-primary font-mono tabular-nums`}
                   aria-invalid={Boolean(error)}
                 />
               </div>
             </div>
 
             {error ? (
-              <p className="mt-2 text-xs text-red-600 flex items-center gap-1 animate-in fade-in">
+              <p className="mt-2 text-xs text-red-600 flex items-center gap-1.5">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 <span>{error}</span>
               </p>
             ) : (
-              <p className="mt-2 text-[11px] text-text-muted flex items-center gap-1">
+              <p className="mt-2 text-xs text-text-muted flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-accent shrink-0" />
-                <span>Required for AI recommendations & table order updates.</span>
+                <span>Used for table order updates and dining preferences.</span>
               </p>
             )}
           </div>
@@ -180,26 +172,25 @@ export const PhoneGateModal: React.FC<PhoneGateModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting || phoneNumber.length !== requiredDigits}
-            className="w-full bg-text-primary text-white py-3.5 px-6 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-[#333] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md mt-6"
+            className="w-full bg-text-primary text-bg-primary py-3 px-6 rounded-sm text-xs font-medium tracking-wide hover:bg-text-primary/90 transition-colors disabled:opacity-45 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Unlocking Menu...</span>
+                <span>Opening Menu...</span>
               </>
             ) : (
               <>
-                <span>Save & Continue</span>
+                <span>Continue to Menu</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        {/* Guarantee Info */}
-        <div className="mt-6 pt-4 border-t border-border/60 text-center">
-          <p className="text-[10px] text-text-muted">
-            Phone verification is compulsory for table orders and AI concierge history.
+        <div className="mt-6 pt-4 border-t border-border">
+          <p className="text-xs text-text-muted">
+            Phone verification is required for table orders and personalized dining history.
           </p>
         </div>
       </div>

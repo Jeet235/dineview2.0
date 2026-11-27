@@ -71,43 +71,38 @@ export default function ManagerLayout() {
     <div className="min-h-screen bg-bg-primary flex flex-col">
       {/* Top Navigation Bar */}
       <header className="bg-white border-b border-border sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-accent text-white rounded-md flex items-center justify-center font-serif font-bold text-lg shadow-xs">
-                D
-              </div>
-              <div>
-                <span className="font-serif font-bold text-text-primary text-base tracking-tight block leading-tight">
-                  DineView
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-accent block leading-none">
-                  Kitchen Manager Portal
-                </span>
-              </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-6 min-w-0">
+            <div className="flex items-baseline gap-2.5 shrink-0">
+              <span className="font-serif font-semibold text-text-primary text-lg tracking-tight whitespace-nowrap">
+                DineView
+              </span>
+              <span className="text-xs text-text-muted whitespace-nowrap">
+                Kitchen Manager
+              </span>
             </div>
 
-            <nav className="hidden sm:flex items-center gap-2 ms-4">
+            <nav className="hidden sm:flex items-center gap-1">
               <button
                 onClick={() => navigate('/manager/orders')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-sm text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
                   location.pathname.includes('/manager/orders') || location.pathname === '/manager'
-                    ? 'bg-text-primary text-white shadow-xs'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-neutral-100'
+                    ? 'bg-text-primary text-bg-primary'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary'
                 }`}
               >
                 <ChefHat className="w-3.5 h-3.5" />
                 <span>Orders</span>
                 {pendingCount > 0 && (
-                  <span className="px-1.5 py-0.2 bg-amber-500 text-white rounded-full text-[10px] font-mono font-bold animate-pulse">
-                    {pendingCount}
+                  <span className="font-mono tabular-nums text-[11px] opacity-85">
+                    ({pendingCount})
                   </span>
                 )}
               </button>
 
               <button
                 onClick={() => navigate('/admin/tables')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary hover:bg-neutral-100 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-medium whitespace-nowrap shrink-0 text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors"
               >
                 <QrCode className="w-3.5 h-3.5" />
                 <span>Table QRs</span>
@@ -115,7 +110,7 @@ export default function ManagerLayout() {
 
               <button
                 onClick={() => navigate('/admin/menu')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-text-primary hover:bg-neutral-100 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-medium whitespace-nowrap shrink-0 text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors"
               >
                 <UtensilsCrossed className="w-3.5 h-3.5" />
                 <span>Menu Manager</span>
@@ -123,17 +118,18 @@ export default function ManagerLayout() {
             </nav>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 shrink-0">
             {pendingCount > 0 && (
-              <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-900 rounded-sm text-xs font-bold">
-                <Bell className="w-3.5 h-3.5 text-amber-600 animate-bounce" />
-                <span>{pendingCount} Pending Confirmation</span>
+              <div className="hidden md:flex items-center gap-1.5 text-xs font-medium text-amber-800 whitespace-nowrap">
+                <Bell className="w-3.5 h-3.5 text-amber-700" />
+                <span className="font-mono tabular-nums">{pendingCount}</span>
+                <span>pending confirmation</span>
               </div>
             )}
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-sm text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-red-600 hover:border-red-200 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-sm text-xs font-medium whitespace-nowrap text-text-secondary hover:text-red-700 hover:border-red-200 transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Logout</span>

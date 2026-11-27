@@ -41,13 +41,16 @@ export const MenuSection = forwardRef<HTMLElement, MenuSectionProps>(
       .map(({ item }) => item);
 
     return (
-      <section ref={ref} id={category.id} className="pt-16 pb-12 scroll-mt-40 border-b border-border last:border-0">
-        <div className="mb-8 md:mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif text-text-primary mb-2">
+      <section ref={ref} id={category.id} className="pt-12 md:pt-16 pb-12 scroll-mt-32 border-b border-border last:border-0">
+        <div className="mb-8 md:mb-10 flex items-baseline justify-between gap-4">
+          <h2 className="text-2xl sm:text-3xl font-serif font-medium text-text-primary tracking-tight">
             {t[category.id] || t[category.name] || category.name}
           </h2>
+          <span className="text-xs font-mono tabular-nums text-text-muted shrink-0">
+            {orderedItems.length} {orderedItems.length === 1 ? 'dish' : 'dishes'}
+          </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-11">
           {orderedItems.map((item) => {
             const cartItem = items.find(i => i.id === item.id);
             return (

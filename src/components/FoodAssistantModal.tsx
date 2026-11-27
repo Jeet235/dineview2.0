@@ -574,84 +574,70 @@ export const FoodAssistantModal: React.FC = () => {
       {/* Floating Concierge Trigger Button */}
       {!isOpen && (
         <button
+          type="button"
           onClick={() => setIsOpen(true)}
-          className={`fixed end-4 sm:end-6 z-40 flex items-center gap-2.5 sm:gap-3 px-3.5 sm:px-5 py-2.5 sm:py-3 bg-bg-primary text-text-primary rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_12px_36px_rgb(0,0,0,0.18)] border-2 border-accent/80 hover:border-accent hover:bg-white transition-all duration-300 hover:scale-105 active:scale-95 group ${
+          className={`fixed end-4 sm:end-6 z-40 flex items-center gap-2.5 px-4 py-2.5 bg-white text-text-primary rounded-sm shadow-lg border border-accent/60 hover:border-text-primary hover:bg-bg-primary transition-colors whitespace-nowrap ${
             isCartButtonVisible
-              ? 'bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-[5.5rem]'
+              ? 'bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] sm:bottom-[5.25rem]'
               : 'bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:bottom-6'
           }`}
           aria-label="Open Food Assistant"
         >
-          <div className="relative flex items-center justify-center">
-            <span className="w-2 h-2 rounded-full bg-accent absolute -top-0.5 -end-0.5 animate-ping opacity-75" />
-            <span className="w-2 h-2 rounded-full bg-accent absolute -top-0.5 -end-0.5" />
-            <Sparkles className="w-4 h-4 text-accent transition-transform duration-300 group-hover:rotate-12" />
-          </div>
-          <div className="flex flex-col text-start">
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-text-primary leading-tight">
-              {t.ai_assistant || 'Food Assistant'}
-            </span>
-            <span className="hidden sm:inline-block text-[9px] text-text-muted tracking-wider font-serif italic">
-              "Let us help you choose"
-            </span>
-          </div>
+          <Sparkles className="w-4 h-4 text-accent shrink-0" />
+          <span className="text-xs font-medium text-text-primary">
+            {t.ai_assistant || 'Food Assistant'}
+          </span>
         </button>
       )}
 
       {/* Slide-over / Modal Chat Window */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex justify-end bg-neutral-950/50 backdrop-blur-xs">
           {/* Backdrop click to close */}
           <div className="absolute inset-0" onClick={() => setIsOpen(false)} />
 
           {/* Concierge Container */}
           <div 
-            className="relative w-full sm:w-[480px] h-full sm:h-[94vh] sm:my-auto sm:me-6 bg-bg-primary sm:border border-border shadow-2xl flex flex-col sm:rounded-lg overflow-hidden z-10 animate-in slide-in-from-bottom-4 sm:slide-in-from-right-4 duration-300"
+            className="relative w-full sm:w-[460px] h-full sm:h-[94vh] sm:my-auto sm:me-5 bg-bg-primary sm:border border-border shadow-xl flex flex-col sm:rounded-sm overflow-hidden z-10"
             role="dialog"
             aria-label="Food Assistant"
           >
             {/* Header */}
-            <div className="px-6 py-5 bg-white border-b border-border flex items-center justify-between shrink-0">
+            <div className="px-5 py-4 bg-white border-b border-border flex items-start justify-between gap-3 shrink-0">
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-accent block">
-                    DineView Concierge
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider bg-accent/10 text-accent border border-accent/25">
-                    <Sparkles className="w-2.5 h-2.5 animate-pulse" />
-                    Gemini AI
-                  </span>
-                </div>
-                <h3 className="font-serif text-xl sm:text-2xl text-text-primary font-normal leading-tight mt-0.5">
+                <p className="text-xs font-medium text-accent">
+                  DineView Concierge
+                </p>
+                <h3 className="font-serif text-xl text-text-primary font-medium leading-tight mt-0.5">
                   Food Assistant
                 </h3>
-                <p className="font-serif text-xs text-text-secondary italic mt-0.5">
-                  "Let us help you choose."
-                </p>
-                {customerProfile && (
-                  <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-accent/10 border border-accent/25 text-[10px] font-bold text-accent">
-                    <UtensilsCrossed className="w-3 h-3" />
-                    <span>
-                      {customerProfile.totalOrders && customerProfile.totalOrders > 0
-                        ? `Welcome back (${maskPhone(customerProfile.phone)}) • ${customerProfile.totalOrders} ${customerProfile.totalOrders === 1 ? 'visit' : 'visits'}`
-                        : `Welcome back (${maskPhone(customerProfile.phone)})`}
-                    </span>
-                  </div>
+                {customerProfile ? (
+                  <p className="text-xs text-text-muted mt-1 font-mono tabular-nums">
+                    {customerProfile.totalOrders && customerProfile.totalOrders > 0
+                      ? `Returning guest (${maskPhone(customerProfile.phone)}) · ${customerProfile.totalOrders} ${customerProfile.totalOrders === 1 ? 'visit' : 'visits'}`
+                      : `Guest (${maskPhone(customerProfile.phone)})`}
+                  </p>
+                ) : (
+                  <p className="text-xs text-text-secondary mt-0.5">
+                    Ask for dish recommendations, pairings, or dietary options.
+                  </p>
                 )}
               </div>
 
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 shrink-0">
                 <button
+                  type="button"
                   onClick={handleResetChat}
-                  className="p-2 text-text-muted hover:text-text-primary hover:bg-bg-primary rounded-full transition-colors"
+                  className="p-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary rounded-sm transition-colors"
                   title="Reset conversation"
                   aria-label="Reset conversation"
                 >
                   <RotateCcw className="w-4 h-4" />
                 </button>
                 <button
+                  type="button"
                   onClick={() => setIsOpen(false)}
-                  className="p-2 text-text-muted hover:text-text-primary hover:bg-bg-primary rounded-full transition-colors"
+                  className="p-2 text-text-muted hover:text-text-primary hover:bg-bg-secondary rounded-sm transition-colors"
                   aria-label="Close assistant"
                 >
                   <X className="w-5 h-5" />
@@ -772,27 +758,27 @@ export const FoodAssistantModal: React.FC = () => {
 
                       {/* FEATURE: Previous Order Card (Last Time Query) */}
                       {msg.response?.lastOrder && (
-                        <div className="bg-white border border-border rounded-sm p-4 shadow-sm space-y-3.5">
+                        <div className="bg-white border border-border rounded-sm p-4 space-y-3.5">
                           {/* Header */}
                           <div className="flex items-center justify-between pb-2.5 border-b border-border">
                             <div className="flex items-center gap-2">
                               <UtensilsCrossed className="w-4 h-4 text-accent" />
-                              <h4 className="font-serif text-sm font-bold text-text-primary uppercase tracking-wider">
+                              <h4 className="font-serif text-sm font-medium text-text-primary">
                                 Previous Dining Record
                               </h4>
                             </div>
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-accent/15 text-accent border border-accent/25">
-                              {msg.response.lastOrder.orderId ? `Order #${msg.response.lastOrder.orderId}` : 'Last Order'}
+                            <span className="text-xs font-mono text-accent">
+                              {msg.response.lastOrder.orderId ? `#${msg.response.lastOrder.orderId}` : 'Last Order'}
                             </span>
                           </div>
 
                           {/* Metadata: Date, Table, Total */}
-                          <div className="grid grid-cols-3 gap-2 p-2.5 bg-bg-primary rounded-xs border border-border/60 text-xs">
+                          <div className="grid grid-cols-3 gap-2 p-2.5 bg-bg-primary rounded-sm border border-border text-xs">
                             <div className="flex flex-col">
-                              <span className="text-[9px] uppercase tracking-wider font-bold text-text-muted flex items-center gap-1">
-                                <Calendar className="w-2.5 h-2.5 text-accent" /> Date
+                              <span className="text-[11px] text-text-muted flex items-center gap-1">
+                                <Calendar className="w-3 h-3 text-text-muted" /> Date
                               </span>
-                              <span className="font-medium text-text-primary text-[11px] truncate mt-0.5">
+                              <span className="font-mono tabular-nums text-text-primary text-[11px] truncate mt-0.5">
                                 {new Date(msg.response.lastOrder.date).toLocaleDateString('en-IN', {
                                   month: 'short',
                                   day: 'numeric',
@@ -803,8 +789,8 @@ export const FoodAssistantModal: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col">
-                              <span className="text-[9px] uppercase tracking-wider font-bold text-text-muted flex items-center gap-1">
-                                <MapPin className="w-2.5 h-2.5 text-accent" /> Table
+                              <span className="text-[11px] text-text-muted flex items-center gap-1">
+                                <MapPin className="w-3 h-3 text-text-muted" /> Table
                               </span>
                               <span className="font-medium text-text-primary text-[11px] truncate mt-0.5">
                                 {msg.response.lastOrder.table}
@@ -812,10 +798,10 @@ export const FoodAssistantModal: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col text-end">
-                              <span className="text-[9px] uppercase tracking-wider font-bold text-text-muted flex items-center justify-end gap-1">
-                                <CreditCard className="w-2.5 h-2.5 text-accent" /> Total
+                              <span className="text-[11px] text-text-muted flex items-center justify-end gap-1">
+                                <CreditCard className="w-3 h-3 text-text-muted" /> Total
                               </span>
-                              <span className="font-serif font-bold text-accent text-xs mt-0.5">
+                              <span className="font-mono tabular-nums font-medium text-text-primary text-xs mt-0.5">
                                 {formatCurrency(msg.response.lastOrder.total)}
                               </span>
                             </div>
@@ -823,10 +809,10 @@ export const FoodAssistantModal: React.FC = () => {
 
                           {/* Ordered Items List with View Buttons */}
                           <div className="space-y-1.5 pt-1">
-                            <span className="text-[9px] uppercase tracking-wider font-bold text-text-muted block">
+                            <span className="text-xs font-medium text-text-muted block">
                               Ordered Items ({msg.response.lastOrder.items.length})
                             </span>
-                            <div className="divide-y divide-border/60">
+                            <div className="divide-y divide-border">
                               {msg.response.lastOrder.items.map((item, idx) => (
                                 <div key={idx} className="py-2.5 flex items-center justify-between gap-3">
                                   <div className="flex items-center gap-2.5 min-w-0">
@@ -834,15 +820,15 @@ export const FoodAssistantModal: React.FC = () => {
                                       <img
                                         src={item.image}
                                         alt={item.name}
-                                        className="w-11 h-11 rounded-xs object-cover shrink-0 border border-border/70"
+                                        className="w-11 h-11 rounded-sm object-cover shrink-0 border border-border"
                                       />
                                     )}
                                     <div className="min-w-0">
-                                      <span className="font-serif text-xs font-bold text-text-primary block truncate">
+                                      <span className="font-serif text-sm text-text-primary block truncate">
                                         {item.name}
                                       </span>
-                                      <span className="text-[10px] text-text-muted block">
-                                        Qty: {item.quantity} {item.price ? `• ${formatCurrency(item.price)}` : ''} {item.calories ? `• ${item.calories} kcal` : ''}
+                                      <span className="text-[11px] font-mono tabular-nums text-text-muted block">
+                                        Qty {item.quantity}{item.price ? ` · ${formatCurrency(item.price)}` : ''}{item.calories ? ` · ${item.calories} kcal` : ''}
                                       </span>
                                     </div>
                                   </div>
@@ -850,7 +836,7 @@ export const FoodAssistantModal: React.FC = () => {
                                   <button
                                     type="button"
                                     onClick={() => handleViewDish(item.id)}
-                                    className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full border border-border hover:border-accent hover:bg-accent hover:text-white text-text-primary text-[9px] font-bold uppercase tracking-wider transition-all"
+                                    className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-sm border border-border hover:border-text-primary text-text-primary text-xs font-medium transition-colors"
                                   >
                                     <span>View</span>
                                     <ArrowRight className="w-3 h-3 rtl:rotate-180" />
@@ -864,43 +850,41 @@ export const FoodAssistantModal: React.FC = () => {
 
                       {/* FEATURE: Same or Different Card */}
                       {msg.response?.sameOrDifferent && (
-                        <div className="bg-white border border-border rounded-sm p-4 shadow-sm space-y-4">
+                        <div className="bg-white border border-border rounded-sm p-4 space-y-4">
                           {/* 1. THE SAME (Favorite Reorder) */}
-                          <div className="space-y-2 pb-3.5 border-b border-border">
-                            <div className="flex items-center justify-between">
+                          <div className="space-y-2.5 pb-4 border-b border-border">
+                            <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-1.5">
                                 <Repeat className="w-3.5 h-3.5 text-accent" />
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-accent">
-                                  Same • Favorite Reorder
+                                <h4 className="text-xs font-medium text-accent">
+                                  Same · Favorite Reorder
                                 </h4>
                               </div>
-                              <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20">
-                                Proven Classic
-                              </span>
+                              <span className="text-xs text-text-muted">Proven Classic</span>
                             </div>
 
-                            <div className="p-3 bg-bg-primary rounded-xs border border-border/70 flex gap-3 items-center justify-between">
+                            <div className="p-3 bg-bg-primary rounded-sm border border-border flex gap-3 items-center justify-between">
                               <div className="flex items-center gap-3 min-w-0">
                                 {msg.response.sameOrDifferent.same.dish.image && (
                                   <img
                                     src={msg.response.sameOrDifferent.same.dish.image}
                                     alt={msg.response.sameOrDifferent.same.dish.name}
-                                    className="w-12 h-12 rounded-xs object-cover shrink-0 border border-border/80"
+                                    className="w-12 h-12 rounded-sm object-cover shrink-0 border border-border"
                                   />
                                 )}
                                 <div className="min-w-0">
-                                  <h5 className="font-serif text-xs sm:text-sm font-bold text-text-primary truncate">
+                                  <h5 className="font-serif text-sm text-text-primary truncate">
                                     {msg.response.sameOrDifferent.same.dish.name}
                                   </h5>
-                                  <div className="flex items-center gap-2 mt-0.5 text-[10px] text-text-secondary">
-                                    <span className="font-semibold text-text-primary">
+                                  <div className="flex items-center gap-1.5 mt-0.5 text-[11px] font-mono tabular-nums text-text-secondary">
+                                    <span className="text-text-primary">
                                       {formatCurrency(msg.response.sameOrDifferent.same.dish.price)}
                                     </span>
-                                    <span>•</span>
+                                    <span>·</span>
                                     <span>{msg.response.sameOrDifferent.same.dish.calories} kcal</span>
                                   </div>
-                                  <p className="text-[10px] text-text-muted italic mt-0.5 line-clamp-1">
-                                    "{msg.response.sameOrDifferent.same.reason}"
+                                  <p className="text-xs text-text-muted mt-0.5 line-clamp-1">
+                                    {msg.response.sameOrDifferent.same.reason}
                                   </p>
                                 </div>
                               </div>
@@ -908,7 +892,7 @@ export const FoodAssistantModal: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => handleViewDish(msg.response!.sameOrDifferent!.same.dish.id)}
-                                className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full border border-border hover:border-text-primary hover:bg-text-primary hover:text-white text-text-primary text-[9px] font-bold uppercase tracking-wider transition-all"
+                                className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-sm border border-border hover:border-text-primary text-text-primary text-xs font-medium transition-colors"
                               >
                                 <span>View</span>
                                 <ArrowRight className="w-3 h-3 rtl:rotate-180" />
@@ -918,44 +902,37 @@ export const FoodAssistantModal: React.FC = () => {
 
                           {/* 2. SOMETHING DIFFERENT */}
                           <div className="space-y-3">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-1.5">
                                 <Shuffle className="w-3.5 h-3.5 text-accent" />
-                                <h4 className="text-[10px] font-bold uppercase tracking-widest text-accent">
+                                <h4 className="text-xs font-medium text-accent">
                                   Something Different
                                 </h4>
                               </div>
-                              <span className="text-[9px] font-medium text-text-muted italic">
-                                Because you had {msg.response.sameOrDifferent.previousDish.name}
+                              <span className="text-[11px] text-text-muted truncate">
+                                After {msg.response.sameOrDifferent.previousDish.name}
                               </span>
                             </div>
 
                             {/* 1 Same-Category Different Dish */}
-                            <div className="p-3 bg-bg-primary rounded-xs border border-border/70 space-y-2">
-                              <div className="flex items-center justify-between text-[10px]">
-                                <span className="font-bold uppercase tracking-wider text-text-muted">
-                                  1. Alternative in {msg.response.sameOrDifferent.different.categoryName}
+                            <div className="p-3 bg-bg-primary rounded-sm border border-border space-y-2">
+                              <div className="flex items-center justify-between gap-2 text-[11px]">
+                                <span className="font-medium text-text-muted">
+                                  Alternative in {msg.response.sameOrDifferent.different.categoryName}
                                 </span>
-                                <div className="flex items-center gap-1.5 font-sans font-semibold">
-                                  <span className={`px-1.5 py-0.5 rounded text-[9px] ${
-                                    msg.response.sameOrDifferent.different.priceDiff > 0 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
-                                  }`}>
-                                    {msg.response.sameOrDifferent.different.priceDiff === 0
-                                      ? 'Same price'
-                                      : msg.response.sameOrDifferent.different.priceDiff > 0
-                                      ? `+${formatCurrency(msg.response.sameOrDifferent.different.priceDiff)}`
-                                      : `-${formatCurrency(Math.abs(msg.response.sameOrDifferent.different.priceDiff))}`}
-                                  </span>
-                                  <span className={`px-1.5 py-0.5 rounded text-[9px] ${
-                                    msg.response.sameOrDifferent.different.calorieDiff > 0 ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
-                                  }`}>
-                                    {msg.response.sameOrDifferent.different.calorieDiff === 0
-                                      ? 'Same kcal'
-                                      : msg.response.sameOrDifferent.different.calorieDiff > 0
-                                      ? `+${msg.response.sameOrDifferent.different.calorieDiff} kcal`
-                                      : `${msg.response.sameOrDifferent.different.calorieDiff} kcal`}
-                                  </span>
-                                </div>
+                                <span className="font-mono tabular-nums text-text-secondary">
+                                  {msg.response.sameOrDifferent.different.priceDiff === 0
+                                    ? 'Same price'
+                                    : msg.response.sameOrDifferent.different.priceDiff > 0
+                                    ? `+${formatCurrency(msg.response.sameOrDifferent.different.priceDiff)}`
+                                    : `-${formatCurrency(Math.abs(msg.response.sameOrDifferent.different.priceDiff))}`}
+                                  {' · '}
+                                  {msg.response.sameOrDifferent.different.calorieDiff === 0
+                                    ? 'Same kcal'
+                                    : msg.response.sameOrDifferent.different.calorieDiff > 0
+                                    ? `+${msg.response.sameOrDifferent.different.calorieDiff} kcal`
+                                    : `${msg.response.sameOrDifferent.different.calorieDiff} kcal`}
+                                </span>
                               </div>
 
                               <div className="flex gap-3 items-center justify-between">
@@ -964,18 +941,18 @@ export const FoodAssistantModal: React.FC = () => {
                                     <img
                                       src={msg.response.sameOrDifferent.different.sameCategoryDish.image}
                                       alt={msg.response.sameOrDifferent.different.sameCategoryDish.name}
-                                      className="w-11 h-11 rounded-xs object-cover shrink-0 border border-border/80"
+                                      className="w-11 h-11 rounded-sm object-cover shrink-0 border border-border"
                                     />
                                   )}
                                   <div className="min-w-0">
-                                    <h5 className="font-serif text-xs sm:text-sm font-bold text-text-primary truncate">
+                                    <h5 className="font-serif text-sm text-text-primary truncate">
                                       {msg.response.sameOrDifferent.different.sameCategoryDish.name}
                                     </h5>
-                                    <div className="flex items-center gap-2 mt-0.5 text-[10px] text-text-secondary">
-                                      <span className="font-semibold text-text-primary">
+                                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] font-mono tabular-nums text-text-secondary">
+                                      <span className="text-text-primary">
                                         {formatCurrency(msg.response.sameOrDifferent.different.sameCategoryDish.price)}
                                       </span>
-                                      <span>•</span>
+                                      <span>·</span>
                                       <span>{msg.response.sameOrDifferent.different.sameCategoryDish.calories} kcal</span>
                                     </div>
                                   </div>
@@ -984,44 +961,37 @@ export const FoodAssistantModal: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => handleViewDish(msg.response!.sameOrDifferent!.different.sameCategoryDish.id)}
-                                  className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full border border-border hover:border-text-primary hover:bg-text-primary hover:text-white text-text-primary text-[9px] font-bold uppercase tracking-wider transition-all"
+                                  className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-sm border border-border hover:border-text-primary text-text-primary text-xs font-medium transition-colors"
                                 >
                                   <span>View</span>
                                   <ArrowRight className="w-3 h-3 rtl:rotate-180" />
                                 </button>
                               </div>
 
-                              <p className="text-[10px] text-text-secondary italic pt-1 border-t border-border/50">
-                                "{msg.response.sameOrDifferent.different.reason}"
+                              <p className="text-xs text-text-secondary pt-1.5 border-t border-border">
+                                {msg.response.sameOrDifferent.different.reason}
                               </p>
                             </div>
 
                             {/* 1 Dessert / Drink Pairing */}
-                            <div className="p-3 bg-bg-primary rounded-xs border border-border/70 space-y-2">
-                              <div className="flex items-center justify-between text-[10px]">
-                                <span className="font-bold uppercase tracking-wider text-text-muted">
-                                  2. Curated {msg.response.sameOrDifferent.different.pairingCategoryName} Pairing
+                            <div className="p-3 bg-bg-primary rounded-sm border border-border space-y-2">
+                              <div className="flex items-center justify-between gap-2 text-[11px]">
+                                <span className="font-medium text-text-muted">
+                                  {msg.response.sameOrDifferent.different.pairingCategoryName} Pairing
                                 </span>
-                                <div className="flex items-center gap-1.5 font-sans font-semibold">
-                                  <span className={`px-1.5 py-0.5 rounded text-[9px] ${
-                                    msg.response.sameOrDifferent.different.pairingPriceDiff > 0 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
-                                  }`}>
-                                    {msg.response.sameOrDifferent.different.pairingPriceDiff === 0
-                                      ? 'Same price'
-                                      : msg.response.sameOrDifferent.different.pairingPriceDiff > 0
-                                      ? `+${formatCurrency(msg.response.sameOrDifferent.different.pairingPriceDiff)}`
-                                      : `-${formatCurrency(Math.abs(msg.response.sameOrDifferent.different.pairingPriceDiff))}`}
-                                  </span>
-                                  <span className={`px-1.5 py-0.5 rounded text-[9px] ${
-                                    msg.response.sameOrDifferent.different.pairingCalorieDiff > 0 ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
-                                  }`}>
-                                    {msg.response.sameOrDifferent.different.pairingCalorieDiff === 0
-                                      ? 'Same kcal'
-                                      : msg.response.sameOrDifferent.different.pairingCalorieDiff > 0
-                                      ? `+${msg.response.sameOrDifferent.different.pairingCalorieDiff} kcal`
-                                      : `${msg.response.sameOrDifferent.different.pairingCalorieDiff} kcal`}
-                                  </span>
-                                </div>
+                                <span className="font-mono tabular-nums text-text-secondary">
+                                  {msg.response.sameOrDifferent.different.pairingPriceDiff === 0
+                                    ? 'Same price'
+                                    : msg.response.sameOrDifferent.different.pairingPriceDiff > 0
+                                    ? `+${formatCurrency(msg.response.sameOrDifferent.different.pairingPriceDiff)}`
+                                    : `-${formatCurrency(Math.abs(msg.response.sameOrDifferent.different.pairingPriceDiff))}`}
+                                  {' · '}
+                                  {msg.response.sameOrDifferent.different.pairingCalorieDiff === 0
+                                    ? 'Same kcal'
+                                    : msg.response.sameOrDifferent.different.pairingCalorieDiff > 0
+                                    ? `+${msg.response.sameOrDifferent.different.pairingCalorieDiff} kcal`
+                                    : `${msg.response.sameOrDifferent.different.pairingCalorieDiff} kcal`}
+                                </span>
                               </div>
 
                               <div className="flex gap-3 items-center justify-between">
@@ -1030,18 +1000,18 @@ export const FoodAssistantModal: React.FC = () => {
                                     <img
                                       src={msg.response.sameOrDifferent.different.pairingDish.image}
                                       alt={msg.response.sameOrDifferent.different.pairingDish.name}
-                                      className="w-11 h-11 rounded-xs object-cover shrink-0 border border-border/80"
+                                      className="w-11 h-11 rounded-sm object-cover shrink-0 border border-border"
                                     />
                                   )}
                                   <div className="min-w-0">
-                                    <h5 className="font-serif text-xs sm:text-sm font-bold text-text-primary truncate">
+                                    <h5 className="font-serif text-sm text-text-primary truncate">
                                       {msg.response.sameOrDifferent.different.pairingDish.name}
                                     </h5>
-                                    <div className="flex items-center gap-2 mt-0.5 text-[10px] text-text-secondary">
-                                      <span className="font-semibold text-text-primary">
+                                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] font-mono tabular-nums text-text-secondary">
+                                      <span className="text-text-primary">
                                         {formatCurrency(msg.response.sameOrDifferent.different.pairingDish.price)}
                                       </span>
-                                      <span>•</span>
+                                      <span>·</span>
                                       <span>{msg.response.sameOrDifferent.different.pairingDish.calories} kcal</span>
                                     </div>
                                   </div>
@@ -1050,15 +1020,15 @@ export const FoodAssistantModal: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => handleViewDish(msg.response!.sameOrDifferent!.different.pairingDish.id)}
-                                  className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full border border-border hover:border-text-primary hover:bg-text-primary hover:text-white text-text-primary text-[9px] font-bold uppercase tracking-wider transition-all"
+                                  className="shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-sm border border-border hover:border-text-primary text-text-primary text-xs font-medium transition-colors"
                                 >
                                   <span>View</span>
                                   <ArrowRight className="w-3 h-3 rtl:rotate-180" />
                                 </button>
                               </div>
 
-                              <p className="text-[10px] text-text-secondary italic pt-1 border-t border-border/50">
-                                "{msg.response.sameOrDifferent.different.pairingReason}"
+                              <p className="text-xs text-text-secondary pt-1.5 border-t border-border">
+                                {msg.response.sameOrDifferent.different.pairingReason}
                               </p>
                             </div>
                           </div>
@@ -1067,86 +1037,77 @@ export const FoodAssistantModal: React.FC = () => {
 
                       {/* Recommendation Cards */}
                       {msg.response?.recommendations && msg.response.recommendations.length > 0 && !msg.response.lastOrder && !msg.response.sameOrDifferent && (
-                        <div className="space-y-3.5 pt-1">
+                        <div className="space-y-3 pt-1">
                           {msg.response.recommendations.map((rec: RecommendationResult, rIdx: number) => {
                             const displayName = getMenuItemName(rec.dish, lang);
                             const hasAR = Boolean(rec.dish.modelUrl);
                             const cardKey = `${msg.id}-${rec.dish.id}-${rIdx}`;
                             const isWhyExpanded = expandedWhyIds[cardKey] || false;
+                            const tagLabels = (rec.dish.tags || []).map((tag) => t[`tag_${tag.id}`] || tag.label);
 
                             return (
                               <div
                                 key={cardKey}
-                                className="bg-white border border-border rounded-sm p-4 shadow-sm hover:border-accent/60 transition-all flex flex-col gap-3 group"
+                                className="bg-white border border-border rounded-sm p-4 hover:border-text-secondary transition-colors flex flex-col gap-3"
                               >
                                 <div className="flex gap-3.5">
                                   {/* Dish Image */}
-                                  <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-sm bg-border overflow-hidden shrink-0 relative">
+                                  <div className="w-20 h-20 rounded-sm bg-bg-secondary border border-border overflow-hidden shrink-0">
                                     <img
                                       src={rec.dish.image}
                                       alt={displayName}
-                                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                      className="w-full h-full object-cover"
                                       loading="lazy"
                                     />
-                                    {hasAR && (
-                                      <span className="absolute bottom-1 end-1 bg-black/85 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-xs uppercase tracking-wider">
-                                        3D / AR
-                                      </span>
-                                    )}
                                   </div>
 
                                   {/* Dish Info */}
                                   <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                                     <div>
-                                      <h4 className="font-serif text-base sm:text-lg text-text-primary font-normal leading-snug truncate">
+                                      <h4 className="font-serif text-base text-text-primary font-normal leading-snug truncate">
                                         {displayName}
                                       </h4>
-                                      <p className="font-serif text-sm font-semibold text-text-primary/90 mt-0.5">
+                                      <p className="font-mono tabular-nums text-xs text-text-primary mt-0.5">
                                         {formatCurrency(rec.dish.price)}
+                                        {hasAR && (
+                                          <span className="text-accent font-sans ms-2">· 3D Preview</span>
+                                        )}
                                       </p>
                                     </div>
 
-                                    {/* Dietary Tags */}
-                                    {rec.dish.tags && rec.dish.tags.length > 0 && (
-                                      <div className="flex flex-wrap gap-1 mt-1.5">
-                                        {rec.dish.tags.map((tag) => (
-                                          <span
-                                            key={tag.id}
-                                            className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-xs border border-border/80 text-text-secondary bg-bg-primary"
-                                          >
-                                            {t[`tag_${tag.id}`] || tag.label}
-                                          </span>
-                                        ))}
-                                      </div>
+                                    {tagLabels.length > 0 && (
+                                      <p className="text-[11px] text-text-muted mt-1 truncate">
+                                        {tagLabels.join(' · ')}
+                                      </p>
                                     )}
                                   </div>
                                 </div>
 
                                 {/* Recommendation Reason */}
-                                <div className="bg-bg-primary border-s-2 border-accent px-3 py-2 text-xs text-text-secondary leading-relaxed font-sans italic">
-                                  "{rec.reason}"
-                                </div>
+                                <p className="text-xs text-text-secondary leading-relaxed">
+                                  {rec.reason}
+                                </p>
 
                                 {/* FEATURE 6: "Why this?" Expandable Explanation */}
                                 {rec.whyBullets && rec.whyBullets.length > 0 && (
-                                  <div className="border-t border-border/50 pt-1.5">
+                                  <div className="border-t border-border pt-1.5">
                                     <button
                                       type="button"
                                       onClick={() => toggleWhy(cardKey)}
-                                      className="flex items-center justify-between w-full text-[10px] font-bold uppercase tracking-widest text-text-muted hover:text-accent transition-colors py-1"
+                                      className="flex items-center justify-between w-full text-xs font-medium text-text-muted hover:text-text-primary transition-colors py-1"
                                     >
                                       <span className="flex items-center gap-1.5">
-                                        <HelpCircle className="w-3 h-3 text-accent" />
-                                        Why this dish?
+                                        <HelpCircle className="w-3.5 h-3.5 text-accent" />
+                                        <span>Why this dish?</span>
                                       </span>
-                                      {isWhyExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                                      {isWhyExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                                     </button>
 
                                     {isWhyExpanded && (
-                                      <div className="mt-1.5 p-2.5 bg-bg-secondary/60 rounded-xs text-[11px] text-text-secondary space-y-1 font-sans animate-in fade-in duration-150">
+                                      <div className="mt-1.5 p-2.5 bg-bg-secondary rounded-sm text-xs text-text-secondary space-y-1">
                                         {rec.whyBullets.map((bullet, bIdx) => (
                                           <div key={bIdx} className="flex items-start gap-1.5 leading-snug">
-                                            <span className="text-accent">•</span>
+                                            <span className="text-accent">·</span>
                                             <span>{bullet}</span>
                                           </div>
                                         ))}
@@ -1157,10 +1118,11 @@ export const FoodAssistantModal: React.FC = () => {
 
                                 {/* VIEW DISH Action */}
                                 <button
+                                  type="button"
                                   onClick={() => handleViewDish(rec.dish.id)}
-                                  className="w-full mt-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full border border-border hover:border-text-primary hover:bg-text-primary hover:text-bg-primary text-text-primary text-[10px] font-bold uppercase tracking-widest transition-all duration-200"
+                                  className="w-full mt-0.5 flex items-center justify-center gap-2 py-2.5 px-4 rounded-sm border border-border hover:border-text-primary hover:bg-text-primary hover:text-bg-primary text-text-primary text-xs font-medium transition-colors"
                                 >
-                                  <span>{hasAR ? (t.view_dish_ar || 'VIEW DISH & AR PREVIEW') : (t.view_dish || 'VIEW DISH')}</span>
+                                  <span>{hasAR ? (t.view_dish_ar || 'View Dish & 3D Preview') : (t.view_dish || 'View Dish')}</span>
                                   <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                                 </button>
                               </div>
@@ -1171,7 +1133,7 @@ export const FoodAssistantModal: React.FC = () => {
 
                       {/* Follow-up Note */}
                       {msg.response?.followUpSuggestion && (
-                        <p className="text-[11px] text-text-muted px-1 font-sans">
+                        <p className="text-xs text-text-muted px-1">
                           {msg.response.followUpSuggestion}
                         </p>
                       )}
@@ -1182,10 +1144,8 @@ export const FoodAssistantModal: React.FC = () => {
 
               {/* Typing Indicator */}
               {isTyping && (
-                <div className="flex items-center gap-1.5 bg-white border border-border px-3.5 py-2.5 rounded-2xl rounded-tl-xs w-16">
-                  <div className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" />
-                  <div className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce [animation-delay:0.2s]" />
-                  <div className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce [animation-delay:0.4s]" />
+                <div className="flex items-center gap-1.5 bg-white border border-border px-3.5 py-2.5 rounded-sm w-fit text-xs text-text-muted">
+                  <span>Thinking…</span>
                 </div>
               )}
 
@@ -1193,16 +1153,17 @@ export const FoodAssistantModal: React.FC = () => {
             </div>
 
             {/* Suggested Prompts */}
-            <div className="px-5 py-3 border-t border-border bg-white shrink-0">
-              <span className="text-[9px] uppercase tracking-[0.2em] text-text-muted font-bold block mb-2">
+            <div className="px-4 py-3 border-t border-border bg-white shrink-0">
+              <span className="text-xs font-medium text-text-muted block mb-2">
                 Suggested Requests
               </span>
               <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
                 {activeSuggestedChips.map((prompt) => (
                   <button
                     key={prompt}
+                    type="button"
                     onClick={() => handlePromptClick(prompt)}
-                    className="whitespace-nowrap px-3.5 py-1.5 bg-bg-primary border border-border hover:border-accent hover:text-accent rounded-full text-[11px] text-text-secondary transition-all shrink-0 font-medium active:scale-95"
+                    className="whitespace-nowrap px-3 py-1.5 bg-bg-primary border border-border hover:border-text-primary hover:text-text-primary rounded-sm text-xs text-text-secondary transition-colors shrink-0"
                   >
                     {prompt}
                   </button>
@@ -1216,7 +1177,7 @@ export const FoodAssistantModal: React.FC = () => {
                 e.preventDefault();
                 handleSend(inputValue);
               }}
-              className="p-4 bg-bg-primary border-t border-border flex items-center gap-2.5 shrink-0"
+              className="p-4 bg-bg-primary border-t border-border flex items-center gap-2 shrink-0"
             >
               <input
                 ref={inputRef}
@@ -1224,12 +1185,12 @@ export const FoodAssistantModal: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="What are you in the mood for?"
-                className="flex-1 bg-white border border-border rounded-full px-4 py-2.5 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent transition-colors"
+                className="flex-1 bg-white border border-border rounded-sm px-3.5 py-2.5 text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-text-primary transition-colors"
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim()}
-                className="w-10 h-10 rounded-full bg-text-primary disabled:opacity-40 text-bg-primary flex items-center justify-center shrink-0 hover:bg-accent transition-colors shadow-xs"
+                className="h-10 px-3.5 rounded-sm bg-text-primary disabled:opacity-40 text-bg-primary flex items-center justify-center shrink-0 hover:bg-text-primary/90 transition-colors"
                 aria-label="Send message"
               >
                 <Send className="w-4 h-4 rtl:rotate-180" />
