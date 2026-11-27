@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useTable, RestaurantTable, formatDemoTableName } from '../../context/TableContext';
 import { Plus, Trash2, Printer, ExternalLink, QrCode, Copy, Check, Sparkles, RefreshCw, Wifi, Globe } from 'lucide-react';
 
-const DEFAULT_CANONICAL_PUBLIC_URL = 'https://dineview-1.ai.studio';
+const CANONICAL_PUBLIC_URL = 'https://dineview-1.ai.studio';
 
 function isLocalOrPrivateHost(hostname: string): boolean {
   const host = hostname.toLowerCase().replace(/^\[|\]$/g, '');
@@ -30,9 +30,9 @@ function isAiStudioPreviewHost(hostname: string): boolean {
   return /^(ais-dev-|ais-pre-).+\.run\.app$/i.test(host);
 }
 
-function normalizeCanonicalPublicUrl(urlStr?: string | null): string | null {
-  if (!urlStr || typeof urlStr !== 'string') return null;
-  const trimmed = urlStr.trim().replace(/\/+$/, '');
+function sanitizePublicOrigin(raw?: string | null): string | null {
+  if (!raw || typeof raw !== 'string') return null;
+  const trimmed = raw.trim().replace(/\/+$/, '');
   if (!trimmed || trimmed.includes('MY_APP_URL')) return null;
   try {
     const parsed = new URL(trimmed);
@@ -47,9 +47,9 @@ function normalizeCanonicalPublicUrl(urlStr?: string | null): string | null {
   return null;
 }
 
-function getPublishedWebsiteOrigin(): string | null {
+function getCurrentPublishedOrigin(): string | null {
   if (typeof window === 'undefined') return null;
-  return normalizeCanonicalPublicUrl(window.location.origin);
+  return sanitizePublicOrigin(window.location.origin);
 }
 
 export default function TableManager() {
@@ -60,46 +60,42 @@ export default function TableManager() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // On the published website, use window.location.origin.
-  // Inside AI Studio previews (ais-dev-*.run.app / ais-pre-*.run.app) or local dev, use VITE_APP_URL (never the preview host).
-  const publishedWebsiteOrigin = getPublishedWebsiteOrigin();
+  // Published site uses its own window.location.origin; AI Studio preview & local dev use non-preview VITE_APP_URL or canonical fallback.
+  const currentPublishedOrigin = getCurrentPublishedOrigin();
   const configuredEnvPublicUrl =
-    normalizeCanonicalPublicUrl(import.meta.env.VITE_APP_URL) ||
-    normalizeCanonicalPublicUrl(import.meta.env.APP_URL);
-  const initialPublicOnlineUrl =
-    publishedWebsiteOrigin || configuredEnvPublicUrl || DEFAULT_CANONICAL_PUBLIC_URL;
+    sanitizePublicOrigin(import.meta.env.VITE_APP_URL) ||
+    sanitizePublicOrigin(import.meta.env.APP_URL);
+  const initialCanonicalPublicUrl =
+    currentPublishedOrigin || configuredEnvPublicUrl || CANONICAL_PUBLIC_URL;
 
-  const [baseUrl, setBaseUrl] = useState<string>(initialPublicOnlineUrl);
+  const [baseUrl, setBaseUrl] = useState<string>(initialCanonicalPublicUrl);
   const [detectedIpUrl, setDetectedIpUrl] = useState<string>('http://10.14.5.42:3000');
-  const [publicOnlineUrl, setPublicOnlineUrl] = useState<string>(initialPublicOnlineUrl);
+  const [publicOnlineUrl, setPublicOnlineUrl] = useState<string>(initialCanonicalPublicUrl);
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
 
   const detectNetworkIp = async () => {
     setIsDetecting(true);
     try {
-      const publishedOrigin = getPublishedWebsiteOrigin();
+      const publishedOrigin = getCurrentPublishedOrigin();
       const envPublicUrl =
-        normalizeCanonicalPublicUrl(import.meta.env.VITE_APP_URL) ||
-        normalizeCanonicalPublicUrl(import.meta.env.APP_URL);
+        sanitizePublicOrigin(import.meta.env.VITE_APP_URL) ||
+        sanitizePublicOrigin(import.meta.env.APP_URL);
       const res = await fetch('/api/network-info');
       if (res.ok) {
         const data = await res.json();
-        const serverPublicUrl = normalizeCanonicalPublicUrl(data.publicUrl);
+        const serverPublicUrl = sanitizePublicOrigin(data.publicUrl);
         const resolvedPublicUrl =
-          publishedOrigin ||
-          envPublicUrl ||
-          serverPublicUrl ||
-          DEFAULT_CANONICAL_PUBLIC_URL;
+          publishedOrigin || envPublicUrl || serverPublicUrl || CANONICAL_PUBLIC_URL;
         setPublicOnlineUrl(resolvedPublicUrl);
         setBaseUrl(resolvedPublicUrl);
         if (data.localUrl) {
           setDetectedIpUrl(data.localUrl);
         }
       } else {
-        const fallbackPublicUrl =
-          publishedOrigin || envPublicUrl || DEFAULT_CANONICAL_PUBLIC_URL;
-        setPublicOnlineUrl(fallbackPublicUrl);
-        setBaseUrl(fallbackPublicUrl);
+        const resolvedPublicUrl =
+          publishedOrigin || envPublicUrl || CANONICAL_PUBLIC_URL;
+        setPublicOnlineUrl(resolvedPublicUrl);
+        setBaseUrl(resolvedPublicUrl);
       }
     } catch (e) {
       console.warn('Could not auto-detect network info:', e);
@@ -117,8 +113,7 @@ export default function TableManager() {
   const normalizedDetectedIpUrl = detectedIpUrl.trim().replace(/\/+$/, '');
 
   const getTableUrl = (tableId: string) => {
-    const cleanBase = baseUrl.trim().replace(/\/+$/, '');
-    return `${cleanBase}/?table=${tableId}`;
+    return `${baseUrl.trim().replace(/\/+$/, '')}/?table=${tableId}`;
   };
 
   const handleCopyLink = async (tableId: string) => {
@@ -271,10 +266,10 @@ export default function TableManager() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {normalizedPublicOnlineUrl && (
+            {publicOnlineUrl && (
               <button
                 type="button"
-                onClick={() => setBaseUrl(normalizedPublicOnlineUrl)}
+                onClick={() => setBaseUrl(publicOnlineUrl)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors border ${
                   normalizedBaseUrl === normalizedPublicOnlineUrl
                     ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
@@ -287,7 +282,7 @@ export default function TableManager() {
             )}
             <button
               type="button"
-              onClick={() => setBaseUrl(normalizedDetectedIpUrl)}
+              onClick={() => setBaseUrl(detectedIpUrl)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-bold uppercase tracking-wider transition-colors border ${
                 normalizedBaseUrl === normalizedDetectedIpUrl
                   ? 'bg-emerald-600 text-white border-emerald-600'

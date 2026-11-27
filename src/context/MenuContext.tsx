@@ -383,7 +383,26 @@ export function MenuProvider({ children }: { children: ReactNode }) {
       if (cat.id === categoryId) {
         return {
           ...cat,
-          items: cat.items.map(item => item.id === itemId ? { ...item, ...updatedItem } : item)
+          items: cat.items.map(item => {
+            if (item.id !== itemId) return item;
+            const merged: MenuItem = { ...item, ...updatedItem };
+            const nameChanged =
+              typeof updatedItem.name === 'string' &&
+              updatedItem.name.trim() !== (item.name || '').trim();
+            const descChanged =
+              typeof updatedItem.description === 'string' &&
+              updatedItem.description.trim() !== (item.description || '').trim();
+
+            if ((nameChanged || descChanged) && merged.translations) {
+              merged.translations = {
+                en: {
+                  name: merged.name,
+                  description: merged.description,
+                },
+              };
+            }
+            return merged;
+          })
         };
       }
       return cat;

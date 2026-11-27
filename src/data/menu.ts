@@ -48,30 +48,52 @@ export const TRANSLATIONS = LOCALES_TRANSLATIONS;
 
 export function getMenuItemName(item: MenuItem, lang: string): string {
   if (!item) return '';
-  if (item.translations && item.translations[lang]?.name) {
-    return item.translations[lang].name;
+  const baseName = item.name?.trim() || '';
+  const defaultEnName = DISH_TRANSLATIONS[item.id]?.en?.name?.trim();
+  const isCustomized = Boolean(baseName && defaultEnName && baseName !== defaultEnName);
+
+  // English always prefers the live dish name (reflecting any Admin dashboard edits).
+  if (!lang || lang === 'en') {
+    return baseName || item.translations?.en?.name || defaultEnName || '';
   }
-  if (DISH_TRANSLATIONS[item.id] && DISH_TRANSLATIONS[item.id][lang]?.name) {
-    return DISH_TRANSLATIONS[item.id][lang].name;
+
+  // For other languages, only use static/cached translations when the dish hasn't been renamed.
+  if (!isCustomized) {
+    const embeddedEnName = item.translations?.en?.name?.trim();
+    const embeddedMatches = !embeddedEnName || !baseName || embeddedEnName === baseName;
+    if (embeddedMatches && item.translations?.[lang]?.name) {
+      return item.translations[lang].name;
+    }
+    if (DISH_TRANSLATIONS[item.id]?.[lang]?.name) {
+      return DISH_TRANSLATIONS[item.id][lang].name;
+    }
   }
-  if (item.translations?.en?.name) {
-    return item.translations.en.name;
-  }
-  return item.name || '';
+
+  return baseName || item.translations?.en?.name || defaultEnName || '';
 }
 
 export function getMenuItemDescription(item: MenuItem, lang: string): string {
   if (!item) return '';
-  if (item.translations && item.translations[lang]?.description) {
-    return item.translations[lang].description;
+  const baseDesc = item.description?.trim() || '';
+  const defaultEnDesc = DISH_TRANSLATIONS[item.id]?.en?.description?.trim();
+  const isCustomized = Boolean(baseDesc && defaultEnDesc && baseDesc !== defaultEnDesc);
+
+  if (!lang || lang === 'en') {
+    return baseDesc || item.translations?.en?.description || defaultEnDesc || '';
   }
-  if (DISH_TRANSLATIONS[item.id] && DISH_TRANSLATIONS[item.id][lang]?.description) {
-    return DISH_TRANSLATIONS[item.id][lang].description;
+
+  if (!isCustomized) {
+    const embeddedEnDesc = item.translations?.en?.description?.trim();
+    const embeddedMatches = !embeddedEnDesc || !baseDesc || embeddedEnDesc === baseDesc;
+    if (embeddedMatches && item.translations?.[lang]?.description) {
+      return item.translations[lang].description;
+    }
+    if (DISH_TRANSLATIONS[item.id]?.[lang]?.description) {
+      return DISH_TRANSLATIONS[item.id][lang].description;
+    }
   }
-  if (item.translations?.en?.description) {
-    return item.translations.en.description;
-  }
-  return item.description || '';
+
+  return baseDesc || item.translations?.en?.description || defaultEnDesc || '';
 }
 
 export const MENU_DATA: MenuCategory[] = [

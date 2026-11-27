@@ -671,9 +671,11 @@ async function startServer() {
 
   // Network info endpoint for mobile QR code generation (supports both public online URL and local Wi-Fi IP)
   app.get("/api/network-info", (req, res) => {
+    const CANONICAL_PUBLIC_URL = "https://dineview-1.ai.studio";
     const ip = getLocalIpAddress();
-    const isNonCanonicalHost = (hostname: string): boolean => {
-      const host = hostname.replace(/^\[|\]$/g, "").toLowerCase();
+
+    const isLocalOrPrivateHost = (hostname: string): boolean => {
+      const host = hostname.toLowerCase().replace(/^\[|\]$/, "");
       return (
         !host ||
         host === "localhost" ||
@@ -685,12 +687,16 @@ async function startServer() {
         /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host) ||
         /^192\.168\.\d{1,3}\.\d{1,3}$/.test(host) ||
         /^169\.254\.\d{1,3}\.\d{1,3}$/.test(host) ||
-        /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(host) ||
-        /^(ais-dev-|ais-pre-).+\.run\.app$/i.test(host)
+        /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/.test(host)
       );
     };
 
-    const parseCanonicalUrl = (raw?: string): string | null => {
+    const isAiStudioPreviewHost = (hostname: string): boolean => {
+      const host = hostname.toLowerCase().replace(/^\[|\]$/, "");
+      return /^(ais-dev-|ais-pre-).+\.run\.app$/i.test(host);
+    };
+
+    const sanitizePublicUrl = (raw?: string | null): string | null => {
       if (!raw || typeof raw !== "string") return null;
       const trimmed = raw.trim().replace(/\/+$/, "");
       if (!trimmed || trimmed.includes("MY_APP_URL")) return null;
@@ -698,7 +704,8 @@ async function startServer() {
         const parsed = new URL(trimmed);
         if (
           (parsed.protocol === "https:" || parsed.protocol === "http:") &&
-          !isNonCanonicalHost(parsed.hostname)
+          !isLocalOrPrivateHost(parsed.hostname) &&
+          !isAiStudioPreviewHost(parsed.hostname)
         ) {
           return parsed.origin.replace(/\/+$/, "");
         }
@@ -716,14 +723,13 @@ async function startServer() {
     let requestPublicUrl: string | null = null;
     if (rawHost && /^[a-z0-9.-]+(:\d+)?$/i.test(rawHost)) {
       const scheme = rawProto === "http" ? "http" : "https";
-      requestPublicUrl = parseCanonicalUrl(`${scheme}://${rawHost}`);
+      requestPublicUrl = sanitizePublicUrl(`${scheme}://${rawHost}`);
     }
 
     const envPublicUrl =
-      parseCanonicalUrl(process.env.VITE_APP_URL) ||
-      parseCanonicalUrl(process.env.APP_URL);
-    const publicUrl =
-      requestPublicUrl || envPublicUrl || "https://dineview-1.ai.studio";
+      sanitizePublicUrl(process.env.VITE_APP_URL) ||
+      sanitizePublicUrl(process.env.APP_URL);
+    const publicUrl = requestPublicUrl || envPublicUrl || CANONICAL_PUBLIC_URL;
     const localUrl = `http://${ip}:${PORT}`;
     const url = publicUrl || localUrl;
     res.json({

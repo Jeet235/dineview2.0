@@ -6,13 +6,11 @@ import { ArrowUpRight } from 'lucide-react';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { useMenu } from '../../context/MenuContext';
 import { saveMenuScrollPosition, getAndClearMenuScrollPosition } from '../../utils/scrollRestoration';
-import heroDiningImg from '../../assets/images/hero_dineview_dining_room_1795754444622.jpg';
 
 export default function HomePage() {
   const { categories } = useMenu();
   const [activeCategory, setActiveCategory] = useState<string>(categories[0]?.id || '');
   const [reservationNotice, setReservationNotice] = useState<string | null>(null);
-  const [heroLoaded, setHeroLoaded] = useState<boolean>(true);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const location = useLocation();
   const { lang, t } = useOutletContext<{ lang: string; t: Record<string, string>; isRTL?: boolean }>();
@@ -108,15 +106,6 @@ export default function HomePage() {
     <>
       {/* Editorial Hero Showcase */}
       <section className="w-full h-[46vh] md:h-[68vh] min-h-[340px] max-h-[680px] relative bg-[#161615] flex flex-col justify-end overflow-hidden">
-        {heroLoaded && (
-          <img
-            src={heroDiningImg}
-            alt="DineView architectural dining room interior with limestone tables and warm pendant lighting"
-            className="absolute inset-0 w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-            onError={() => setHeroLoaded(false)}
-          />
-        )}
         {/* Measured scrim guaranteeing >=4.5:1 text contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/15" />
 
